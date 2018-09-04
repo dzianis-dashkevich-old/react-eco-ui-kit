@@ -10,6 +10,14 @@ const output = { path: dist, filename: 'bundle.js' };
 module.exports = {
 	entry,
 	output,
+	resolve: {
+		alias: {
+			uiKitUtils: resolve(src, 'utils'),
+			uiKitComponents: resolve(src, 'components')
+		},
+		extensions: ['js', 'jsx'],
+		modules: ['node_modules', src],
+	},
 	module: {
 		rules: [
 			{
@@ -17,6 +25,7 @@ module.exports = {
 				use: 'babel-loader',
 			}
 		]
-	}
+	},
+	mode: 'production'
 };
 
