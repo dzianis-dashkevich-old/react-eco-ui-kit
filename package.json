@@ -1,12 +1,40 @@
 {
-  "name": "ui-kit",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+	"name": "eco-react-ui-kit",
+	"version": "1.0.0",
+	"description": "Set of presentational ReactJS components.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DenisDashkevich/eco-react-ui-kit"
+	},
+	"main": "./dist/bundle.js",
+	"scripts": {
+		"test": "jest --forceExit --silent --detectOpenHandles",
+		"build": "webpack --config webpack.config.js --progress",
+		"watch": "webpack --config webpack.config.js --progress --watch"
+	},
+	"keywords": [
+		"ui-kit",
+		"react-ui-kit"
+	],
+	"author": "Dzianis Dashkevich",
+	"license": "MIT",
+	"peerDependencies": {
+		"react": "^16.0.0"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.0.0",
+		"@babel/core": "^7.0.0",
+		"@babel/plugin-proposal-class-properties": "^7.0.0",
+		"@babel/preset-env": "^7.0.0",
+		"@babel/preset-react": "^7.0.0",
+		"babel-jest": "^23.4.2",
+		"babel-loader": "^8.0.2",
+		"jest": "^23.5.0",
+		"react": "^16.4.2",
+		"webpack": "^4.17.1",
+		"webpack-cli": "^3.1.0"
+	},
+	"dependencies": {
+		"prop-types": "^15.6.2"
+	}
 }

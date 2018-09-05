@@ -4,28 +4,38 @@ const src = resolve(__dirname, 'src');
 const indexJs = resolve(src, 'index.js');
 const dist = resolve(__dirname, 'dist');
 
+const uiKitUtils = resolve(src, 'utils');
+const uiKitComponents = resolve(src, 'components');
+
+console.log(uiKitComponents);
+
 const entry = indexJs;
-const output = { path: dist, filename: 'bundle.js' };
+const output = {
+	path: dist,
+	filename: 'bundle.js',
+	library: 'MYAWESOME',
+	libraryTarget: 'umd'
+};
 
 module.exports = {
 	entry,
 	output,
 	resolve: {
 		alias: {
-			uiKitUtils: resolve(src, 'utils'),
-			uiKitComponents: resolve(src, 'components')
+			uiKitUtils,
+			uiKitComponents,
 		},
-		extensions: ['js', 'jsx'],
+		extensions: ['.js', '.jsx'],
 		modules: ['node_modules', src],
 	},
 	module: {
 		rules: [
 			{
-				test: indexJs,
+				test: src,
 				use: 'babel-loader',
 			}
 		]
 	},
-	mode: 'production'
+	mode: 'development'
 };
 

@@ -1,5 +1,3 @@
-import { noop } from "../../../utils/functional";
-
 export const isValueInvalid = value => !value || value < 1;
 
 export const calculateAllAvailablePickers = (all, perPage) =>
@@ -27,13 +25,13 @@ const wrapPickerMeta = value => ({
 });
 
 const updateMetaDependingOnFlags = ({
-	meta,
-	isFirsLabel,
-	isLastLabel,
-	isDisabled,
-	isPicked,
-	lastIndex
-}) => {
+	                                    meta,
+	                                    isFirsLabel,
+	                                    isLastLabel,
+	                                    isDisabled,
+	                                    isPicked,
+	                                    lastIndex
+                                    }) => {
 	const result = { ...meta };
 
 	if (isFirsLabel) {
@@ -56,14 +54,14 @@ const updateMetaDependingOnFlags = ({
 };
 
 export const producePickerMap = ({
-	isDelimeterViseble,
-	currentIndex,
-	lastIndex = 1,
-	indexes = [],
-	labels,
-	controls,
-	delimeter
-}) => {
+	                                 isDelimeterViseble,
+	                                 currentIndex,
+	                                 lastIndex = 1,
+	                                 indexes = [],
+	                                 labels,
+	                                 controls,
+	                                 delimeter
+                                 }) => {
 	const result = [];
 
 	labels && result.push(labels.firstLabel);
@@ -148,12 +146,12 @@ const calculateIndexesDown = (currentIndex, indexCount, all) => {
 };
 
 export const calculateIndexes = ({
-	currentIndex,
-	up,
-	down,
-	all,
-	visibleAmount
-}) => {
+	                                 currentIndex,
+	                                 up,
+	                                 down,
+	                                 all,
+	                                 visibleAmount
+                                 }) => {
 	if (
 		isValueInvalid(currentIndex) ||
 		isValueInvalid(all) ||

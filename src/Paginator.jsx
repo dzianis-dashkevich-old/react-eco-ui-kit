@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-
-import {
-	PAGINATOR_PROP_TYPES_ALL,
-	PAGINATOR_DEFAULT_PROP_TYPES,
-} from './propTypes';
+import PropTypes from 'prop-types';
 
 import Picker from './Picker';
 import Input from './Input';
@@ -14,13 +10,10 @@ import {
 	producePickerMap,
 	calculateIndexes,
 	needDelimeter,
-	noop,
-} from './paginatorUtils';
+} from './utils/paginator';
+import { noop } from './utils/functional';
 
 export default class Paginator extends Component {
-	static defaultProps = PAGINATOR_DEFAULT_PROP_TYPES;
-	static propTypes = PAGINATOR_PROP_TYPES_ALL;
-
 	constructor (props) {
 		super(props);
 
@@ -206,3 +199,71 @@ export default class Paginator extends Component {
 			</div>)
 	}
 }
+
+Paginator.defaultProps = {
+	/** assets configuration **/
+	valuePerPage: 10,
+	amountPickersToShow: 4,
+
+	/** customization **/
+	customPicker: Picker,
+	color: 'blue',
+
+	/** delimeter configuration **/
+	enableDelimeter: true,
+	delimeter: '...',
+
+	/** labels configuration **/
+	enableLabels: true,
+	firstLabel: 'First',
+	lastLabel: 'Last',
+
+	/** controls configuration **/
+	enableControls: true,
+	controlUp: '>',
+	controlDown: '<',
+
+	/** input configuration **/
+	enableInputControl: true,
+	customInput: Input,
+
+	/** base configuration **/
+	onPickerChange: noop,
+	initIndex: 1,
+};
+
+Paginator.propTypes = {
+	/** mandatory prop **/
+	amount: PropTypes.number,
+
+	/** assets configuration **/
+	valuePerPage: PropTypes.number,
+	amountPickersToShow: PropTypes.number,
+
+	/** customization **/
+	customPicker: PropTypes.any,
+	color: PropTypes.string,
+
+	/** delimeter configuration **/
+	enableDelimeter: PropTypes.bool,
+	delimeter: PropTypes.string,
+
+	/** labels configuration **/
+	enableLabels: PropTypes.bool,
+	firstLabel: PropTypes.string,
+	lastLabel: PropTypes.string,
+
+	/** controls configuration **/
+	enableControls: PropTypes.bool,
+	controlUp: PropTypes.any,
+	controlDown: PropTypes.any,
+
+	/** input configuration **/
+	enableInputControl: PropTypes.bool,
+	customInput: PropTypes.any,
+	inputControlValidator: PropTypes.func,
+
+	/** base configuration **/
+	onPickerChange: PropTypes.func,
+	initIndex: PropTypes.number,
+};

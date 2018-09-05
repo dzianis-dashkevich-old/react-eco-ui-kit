@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-import { PICKER_DEFAUL_PROP_TYPES, PICKER_PROP_TYPES_ALL } from './propTypes';
-import { PICKER_DISABLED, PICKER_PICKED, PICKER } from './consts';
+import { noop } from './utils/functional';
+
+import { PICKER_DISABLED, PICKER_PICKED, PICKER } from './consts/picker';
 
 export default class Picker extends Component {
-	static defaultProps = PICKER_DEFAUL_PROP_TYPES;
-	static propTypes = PICKER_PROP_TYPES_ALL;
-
 	onClick = () => {
 		const { onPickerClick, pickerIndex, disabled } = this.props;
 
@@ -32,3 +31,18 @@ export default class Picker extends Component {
 		);
 	}
 }
+
+Picker.defaultProps = {
+	onPickerClick: noop,
+	disabled: false,
+	picked: false,
+	value: 'def',
+};
+
+Picker.propTypes = {
+	disabled: PropTypes.bool,
+	picked: PropTypes.bool,
+	value: PropTypes.any,
+	onPickerClick: PropTypes.func,
+	pickerIndex: PropTypes.any,
+};

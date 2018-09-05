@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-import { INPUT_DEFAULT_PROP_TYPES, INPUT_PROP_TYPES_ALL } from './propTypes';
+import { noop } from './utils/functional';
+import { basicNumberValidator } from './utils/input';
 
 export default class Input extends Component {
-	static defaultProps = INPUT_DEFAULT_PROP_TYPES;
-	static propTypes = INPUT_PROP_TYPES_ALL;
-
 	constructor (props) {
 		super(props);
 
@@ -46,3 +45,15 @@ export default class Input extends Component {
 			/>)
 	}
 }
+
+Input.defaultProps = {
+	onInputChange: noop,
+	validator: basicNumberValidator,
+};
+
+Input.propTypes = {
+	maxValue: PropTypes.number,
+	validator: PropTypes.func,
+	onInputChange: PropTypes.func,
+	currentIndex: PropTypes.any,
+};
