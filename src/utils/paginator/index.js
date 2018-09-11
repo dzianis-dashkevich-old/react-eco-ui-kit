@@ -5,7 +5,7 @@ export const calculateAllAvailablePickers = (all, perPage) =>
 		? 0
 		: Math.ceil(all / perPage);
 
-export const calculateVisablePickers = (all, toShow) => {
+export const calculateVisiblePickers = (all, toShow) => {
 	if (isValueInvalid(all) || isValueInvalid(toShow)) {
 		return 0;
 	}
@@ -15,6 +15,76 @@ export const calculateVisablePickers = (all, toShow) => {
 	}
 
 	return all;
+};
+
+export const createSequence = (from, to, step = 1) => {
+	if(isNaN(parseInt(from)) || isNaN(parseInt(to))) {
+		return [];
+	}
+
+	const max = Math.max(from, to);
+	const min = Math.min(from, to);
+
+	const getBreakCase = (from) => (step > 0 && from > max) || (step < 0 && from < min);
+	const makeStep = () => from = from + step;
+
+	const result = [from];
+
+	while(!getBreakCase(makeStep())) {
+		result.push(from);
+	}
+
+	return result;
+};
+
+export const calculateIndexesUp = (currentIndex, indexCount, lastIndex) => {
+	if (currentIndex > lastIndex) {
+		throw new Error('Current index can`t be more then last index');
+	}
+
+	const withoutLast = currentIndex + indexCount < lastIndex;
+
+	if (!withoutLast) {
+		return createSequence(lastIndex - indexCount, lastIndex);
+	}
+
+	return createSequence(currentIndex, indexCount + (currentIndex - 1));
+};
+
+export const calculateIndexesDown = (currentIndex, indexCount, lastIndex) => {
+	if (currentIndex - indexCount <= 0) {
+		return createSequence(1, indexCount);
+	}
+
+	const from = currentIndex - (indexCount - 1);
+
+	return calculateIndexesUp(from, indexCount, lastIndex);
+};
+
+export const calculateIndexes = (
+	{ currentIndex, up, down, all, visibleAmount },
+	calcIndexUp = calculateIndexesUp,
+	calIndexDown = calculateIndexesDown
+	) => {
+	if (up && down) {
+		throw new Error("only one direction should be provided");
+	}
+
+	if (isValueInvalid(currentIndex) || isValueInvalid(all) || isValueInvalid(visibleAmount)) {
+		return [];
+	}
+
+	if (visibleAmount <= 2) {
+		return createSequence(1, visibleAmount);
+	}
+
+	const args = [currentIndex, visibleAmount - 1, all];
+
+	if(!up && !down) {
+		up = true;
+	}
+
+	return up ? calcIndexUp(...args) : calIndexDown(...args);
 };
 
 const wrapPickerMeta = value => ({
@@ -107,82 +177,4 @@ export const producePickerMap = ({
 	});
 };
 
-const createSequence = (from, to, step = 1) => {
-	const result = [];
-
-	let init = from;
-
-	for (let i = 0; i <= to - from; i++) {
-		result.push(init);
-
-		init = init + step;
-
-		if (init > to) {
-			break;
-		}
-	}
-
-	return result;
-};
-
-const calculateIndexesUp = (currentIndex, indexCount, all) => {
-	const withoutLast = currentIndex + indexCount < all;
-
-	if (!withoutLast) {
-		return createSequence(all - indexCount, all);
-	}
-
-	return createSequence(currentIndex, indexCount + (currentIndex - 1));
-};
-
-const calculateIndexesDown = (currentIndex, indexCount, all) => {
-	if (currentIndex - indexCount <= 0) {
-		return createSequence(1, indexCount);
-	}
-
-	const currentFromValue = currentIndex - (indexCount - 1);
-
-	return calculateIndexesUp(currentFromValue, indexCount, all);
-};
-
-export const calculateIndexes = ({
-	                                 currentIndex,
-	                                 up,
-	                                 down,
-	                                 all,
-	                                 visibleAmount
-                                 }) => {
-	if (
-		isValueInvalid(currentIndex) ||
-		isValueInvalid(all) ||
-		isValueInvalid(visibleAmount)
-	) {
-		return [];
-	}
-
-	if (up && down) {
-		throw new Error("only one direction should be provided");
-	}
-
-	if (visibleAmount <= 2) {
-		return createSequence(1, visibleAmount);
-	}
-
-	const indexCount = visibleAmount - 1;
-
-	if (up) {
-		return calculateIndexesUp(currentIndex, indexCount, all, visibleAmount);
-	}
-
-	if (down) {
-		return calculateIndexesDown(
-			currentIndex,
-			indexCount,
-			all,
-			visibleAmount
-		);
-	}
-};
-
-export const needDelimeter = (indexes, visibleAmount) =>
-	indexes.length !== visibleAmount;
+export const needDelimeter = (indexes, visibleAmount) => indexes.length !== visibleAmount;

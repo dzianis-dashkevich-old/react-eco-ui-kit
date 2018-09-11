@@ -6,7 +6,7 @@ import Input from './Input';
 
 import {
 	calculateAllAvailablePickers,
-	calculateVisablePickers,
+	calculateVisiblePickers,
 	producePickerMap,
 	calculateIndexes,
 	needDelimeter,
@@ -20,7 +20,7 @@ export default class Paginator extends Component {
 		const { valuePerPage, amount, amountPickersToShow, initIndex } = props;
 
 		const allPickers = calculateAllAvailablePickers(amount, valuePerPage);
-		const visiblePickers = calculateVisablePickers(allPickers, amountPickersToShow);
+		const visiblePickers = calculateVisiblePickers(allPickers, amountPickersToShow);
 
 		const initialDirection = { up: true, down: false };
 
