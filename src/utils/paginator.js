@@ -87,70 +87,19 @@ export const calculateIndexes = (
 	return up ? calcIndexUp(...args) : calIndexDown(...args);
 };
 
-const wrapPickerMeta = value => ({
-	value,
-	pickerIndex: value,
-	disabled: false,
-	picked: false
-});
+export const addValue = (value) => (arr = []) => value ? [...arr, value] : arr;
+export const addValues = (values = []) => (arr = []) => values.length ? arr.concat(values) : arr;
 
-const updateMetaDependingOnFlags = ({
-	                                    meta,
-	                                    isFirsLabel,
-	                                    isLastLabel,
-	                                    isDisabled,
-	                                    isPicked,
-	                                    lastIndex
-                                    }) => {
-	const result = { ...meta };
-
-	if (isFirsLabel) {
-		result.pickerIndex = 1;
-	}
-
-	if (isLastLabel) {
-		result.pickerIndex = lastIndex;
-	}
-
-	if (isDisabled) {
-		result.disabled = true;
-	}
-
-	if (isPicked) {
-		result.picked = true;
-	}
-
-	return result;
-};
-
-export const producePickerMap = ({
-	                                 isDelimeterViseble,
-	                                 currentIndex,
-	                                 lastIndex = 1,
-	                                 indexes = [],
-	                                 labels,
-	                                 controls,
-	                                 delimeter
-                                 }) => {
-	const result = [];
-
-	labels && result.push(labels.firstLabel);
-	controls && result.push(controls.controlDown);
-
-	result.push(...indexes);
-
-	if (isDelimeterViseble) {
-		delimeter && result.push(delimeter);
-
-		result.push(lastIndex);
-	}
-
-	controls && result.push(controls.controlUp);
-	labels && result.push(labels.lastLabel);
-
-	return result.map(value => {
-		const meta = wrapPickerMeta(value);
-
+export const producePickerMap = ({ withLast, currentIndex, lastIndex, indexes, labels, controls, delimeter }) => {
+	return pipe(
+		addValue(labels.firstLabel),
+		addValue(controls.controlDown),
+		addValues(indexes),
+		addValue(withLast && delimeter),
+		addValue(withLast && lastIndex),
+		addValue(controls.controlUp),
+		addValue(labels.lastLabel)
+	)([]).map((value) => {
 		const isControlUp = value === controls.controlUp;
 		const isControlDown = value === controls.controlDown;
 
@@ -163,18 +112,10 @@ export const producePickerMap = ({
 		const disableFirst = isControlDown || isFirsLabel;
 		const disableLast = isControlUp || isLastLabel;
 
-		const isDisabled = (disableFirst && isFirst) || (disableLast && isLast);
-		const isPicked = value === currentIndex;
+		const disabled = (disableFirst && isFirst) || (disableLast && isLast);
+		const picked = value === currentIndex;
+		const pickerIndex = isFirsLabel ? 1 : isLastLabel ? lastIndex : value;
 
-		return updateMetaDependingOnFlags({
-			meta,
-			isFirsLabel,
-			isLastLabel,
-			isDisabled,
-			isPicked,
-			lastIndex
-		});
+		return { value, disabled, picked, pickerIndex };
 	});
 };
-
-export const needDelimeter = (indexes, visibleAmount) => indexes.length !== visibleAmount;

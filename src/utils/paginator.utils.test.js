@@ -6,7 +6,13 @@ import {
 	calculateIndexesUp,
 	calculateIndexesDown,
 	calculateIndexes,
-} from './index';
+	addValue,
+	addValues,
+	producePickerMap,
+} from './paginator';
+
+const wrapPicker = (value) => ({ value, disabled: false, picked: false, pickerIndex: value });
+const wrapPickers = (values = []) => values.map(wrapPicker);
 
 describe('paginator utils spec', () => {
 	describe('isValueInvalid', () => {
@@ -219,6 +225,218 @@ describe('paginator utils spec', () => {
 
 			expect(calIndexDown).toHaveBeenCalledTimes(1);
 			expect(calIndexDown).toHaveBeenCalledWith(6, 4, 20);
+		});
+	});
+
+	describe('addValue', () => {
+		it('should return function', () => {
+			const f = addValue();
+
+			expect(f).toBeInstanceOf(Function);
+		});
+
+		it('should return new array, if values provided', () => {
+			const arr = [12,12];
+
+			expect(addValue(13)(arr)).not.toBe(arr);
+		});
+
+		it('should return old arr, if no values provided', () => {
+			const arr = [12,12];
+
+			expect(addValue()(arr)).toBe(arr);
+		});
+
+		it('should add new value', () => {
+			expect(addValue(12)([13])).toEqual([13,12]);
+			expect(addValue(12)([])).toEqual([12]);
+			expect(addValue(12)([13, 14])).toEqual([13,14,12]);
+			expect(addValue(12)()).toEqual([12]);
+		})
+	});
+
+	describe('addValues', () => {
+		it('should return function', () => {
+			const f = addValues();
+
+			expect(f).toBeInstanceOf(Function);
+		});
+
+		it('should return new array, if values provided', () => {
+			const arr = [12,12];
+
+			expect(addValues([13])(arr)).not.toBe(arr);
+		});
+
+		it('should return old arr, if no values provided', () => {
+			const arr = [12,12];
+
+			expect(addValues()(arr)).toBe(arr);
+		});
+
+		it('should concat provided values, to existing array', () => {
+			expect(addValues([1,2,3])([5])).toEqual([5,1,2,3]);
+			expect(addValues([1,2,3,4,5])([5,6])).toEqual([5,6,1,2,3,4,5]);
+
+			expect(addValues()()).toEqual([]);
+
+			expect(addValues([12])()).toEqual([12]);
+			expect(addValues()([12])).toEqual([12]);
+
+			expect(addValues([])([12])).toEqual([12]);
+			expect(addValues([12])([])).toEqual([12]);
+		});
+	});
+
+	describe('producePickerMap', () => {
+		it('should throw an error, if lastIndex is not provided', () => {
+			expect(() => producePickerMap()).toThrow();
+		});
+
+		it('should return new array', () => {
+			expect(producePickerMap({ lastIndex: 12 })).toEqual([]);
+		});
+
+		it('should return array with pickers, depending on provided options', () => {
+			const indexes = [1,2,3,4,5];
+
+			const firstLabel = 'FIRST';
+			const lastLabel = 'LAST';
+
+			const onlyFirstLable = { firstLabel };
+			const onlyLastLabel = { lastLabel };
+			const labels = { firstLabel, lastLabel };
+
+			const controlUp = '>';
+			const controlDown = '<';
+
+			const onlyUpConrol = { controlUp };
+			const onlyDownControl = { controlDown };
+			const controls = { controlUp, controlDown };
+
+			const withLast = true;
+			const lastIndex = 6;
+			const delimeter = '...';
+
+			//only indexes
+			const onlyIndexes = producePickerMap({ indexes, lastIndex });
+			const expectedOnlyIndexes = wrapPickers(indexes);
+
+			expect(onlyIndexes).toEqual(expectedOnlyIndexes);
+
+			// indexes, first label
+			const indexesAndFirstLabel = producePickerMap({ indexes, labels: onlyFirstLable, lastIndex });
+			const expectedIndexesAndFirstLabel = wrapPickers([firstLabel, ...indexes]);
+			expectedIndexesAndFirstLabel[0].pickerIndex = 1;
+
+			expect(indexesAndFirstLabel).toEqual(expectedIndexesAndFirstLabel);
+
+			// indexes, last label
+			const indexesAndLastLabels = producePickerMap({ indexes, labels: onlyLastLabel, lastIndex });
+			const expectedIndexesAndLastLabels = wrapPickers([...indexes, lastLabel]);
+			expectedIndexesAndLastLabels[expectedIndexesAndLastLabels.length - 1].pickerIndex = lastIndex;
+
+			expect(indexesAndLastLabels).toEqual(expectedIndexesAndLastLabels);
+
+			//indexes, all labels
+			const indexesAndAllLabels = producePickerMap({ indexes, labels, lastIndex });
+			const expectedIndexesAndAllLabels = wrapPickers([firstLabel, ...indexes, lastLabel]);
+			expectedIndexesAndAllLabels[0].pickerIndex = 1;
+			expectedIndexesAndAllLabels[expectedIndexesAndAllLabels.length - 1].pickerIndex = lastIndex;
+
+			expect(indexesAndAllLabels).toEqual(expectedIndexesAndAllLabels);
+
+			//indexes, controlUp
+			const indexesAndControlUp = producePickerMap({ indexes, controls: onlyUpConrol, lastIndex });
+			const expectedIndexesAndControlUp = wrapPickers([...indexes, controlUp]);
+
+			expect(indexesAndControlUp).toEqual(expectedIndexesAndControlUp);
+
+			//indexes, controlDown
+			const indexesAndContolDown = producePickerMap({ indexes, controls: onlyDownControl, lastIndex });
+			const expectedIndexesAndContolDown = wrapPickers([controlDown, ...indexes]);
+
+			expect(indexesAndContolDown).toEqual(expectedIndexesAndContolDown);
+
+			//indexes, all controls
+			const indexesAndAllControls = producePickerMap({ indexes, controls, lastIndex });
+			const expectedIndexesAndAllControls = wrapPickers([controlDown, ...indexes, controlUp]);
+
+			expect(indexesAndAllControls).toEqual(expectedIndexesAndAllControls);
+
+			//indexes, labels, controls
+			const indexesAndAllLabelsAndAllControls = producePickerMap({ indexes, controls, labels, lastIndex });
+			const expectedIndexesAndAllLabelsAndAllControls = [
+				expectedIndexesAndAllLabels[0],
+				expectedIndexesAndAllControls[0],
+				...wrapPickers(indexes),
+				expectedIndexesAndAllControls[expectedIndexesAndAllControls.length - 1],
+				expectedIndexesAndAllLabels[expectedIndexesAndAllLabels.length - 1],
+			];
+
+			expect(indexesAndAllLabelsAndAllControls).toEqual(expectedIndexesAndAllLabelsAndAllControls);
+
+			//with last no delimeter
+			const withLastNoDelimeter = producePickerMap({ indexes, controls, labels, withLast, lastIndex });
+			const expectedWithLastNoDelimeter = [
+				expectedIndexesAndAllLabels[0],
+				expectedIndexesAndAllControls[0],
+				...wrapPickers([...indexes, lastIndex]),
+				expectedIndexesAndAllControls[expectedIndexesAndAllControls.length - 1],
+				expectedIndexesAndAllLabels[expectedIndexesAndAllLabels.length - 1],
+			];
+
+			expect(withLastNoDelimeter).toEqual(expectedWithLastNoDelimeter);
+
+			//with last, delimeter, last index
+			const withLastAndDelimeter = producePickerMap({ indexes, controls, labels, withLast, lastIndex, delimeter });
+			const expectedWithLastAndDelimeter = [
+				expectedIndexesAndAllLabels[0],
+				expectedIndexesAndAllControls[0],
+				...wrapPickers([...indexes, delimeter, lastIndex]),
+				expectedIndexesAndAllControls[expectedIndexesAndAllControls.length - 1],
+				expectedIndexesAndAllLabels[expectedIndexesAndAllLabels.length - 1],
+			];
+
+			expect(withLastAndDelimeter).toEqual(expectedWithLastAndDelimeter);
+
+			//with currentIndex first
+			const withCurrentIndexOne = producePickerMap({ indexes, controls, labels, withLast, lastIndex, delimeter, currentIndex: 1 });
+			const expectedWithCurrentIndex = [
+				expectedIndexesAndAllLabels[0],
+				expectedIndexesAndAllControls[0],
+				...wrapPickers([...indexes, delimeter, lastIndex]),
+				expectedIndexesAndAllControls[expectedIndexesAndAllControls.length - 1],
+				expectedIndexesAndAllLabels[expectedIndexesAndAllLabels.length - 1],
+			];
+			expectedWithCurrentIndex[0].disabled = true;
+			expectedWithCurrentIndex[1].disabled = true;
+			expectedWithCurrentIndex[2].picked = true;
+
+			expect(withCurrentIndexOne).toEqual(expectedWithCurrentIndex);
+
+			//with current index last
+			const withCurrentIndexTwo = producePickerMap({ 
+				indexes, 
+				controls, 
+				labels, 
+				withLast, 
+				lastIndex, 
+				delimeter, 
+				currentIndex: indexes[indexes.length - 1] });
+
+			const expectedWithCurrentIndexTwo = [
+				expectedIndexesAndAllLabels[0],
+				expectedIndexesAndAllControls[0],
+				...wrapPickers([...indexes, delimeter, lastIndex]),
+				expectedIndexesAndAllControls[expectedIndexesAndAllControls.length - 1],
+				expectedIndexesAndAllLabels[expectedIndexesAndAllLabels.length - 1],
+			];
+			expectedWithCurrentIndexTwo[expectedWithCurrentIndexTwo.length - 1].disabled = true;
+			expectedWithCurrentIndexTwo[expectedWithCurrentIndexTwo.length - 2].disabled = true;
+			expectedWithCurrentIndexTwo[expectedWithCurrentIndexTwo.length -3].picked = true;
+
+			expect(withCurrentIndexTwo).toEqual(withCurrentIndexTwo);
 		});
 	});
 });
