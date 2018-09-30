@@ -9,7 +9,6 @@ import {
 	calculateVisiblePickers,
 	producePickerMap,
 	calculateIndexes,
-	needDelimeter,
 } from './utils/paginator';
 import { noop } from './utils/functional';
 
@@ -31,13 +30,6 @@ export default class Paginator extends Component {
 			currentIndex: initIndex,
 			direction: initialDirection,
 		};
-
-		console.log(this.state);
-
-		this._defaultStyle = {
-			display: 'flex',
-			alignItems: 'baseline',
-		}
 	}
 
 	toggleDirection () {
@@ -46,8 +38,6 @@ export default class Paginator extends Component {
 		const newDirection = { up: !up, down: !down };
 
 		this.setState({ direction: newDirection });
-
-		console.log('toggle direction');
 	}
 
 	onPickerChange = (index) => {
@@ -72,39 +62,22 @@ export default class Paginator extends Component {
 
 		this.setState({ currentIndex: indexToUpdate });
 
-		console.log('change index');
-
 		this.props.onPickerChange(indexToUpdate);
 	};
 
 	calculateLabels () {
 		const { enableLabels, firstLabel, lastLabel } = this.props;
-
-		if (!enableLabels) {
-			return false;
-		}
-
-		return { firstLabel, lastLabel };
+		return enableLabels ? { firstLabel, lastLabel } : {};
 	}
 
 	calculateControls () {
 		const { enableControls, controlUp, controlDown } = this.props;
-
-		if (!enableControls) {
-			return false;
-		}
-
-		return { controlUp, controlDown };
+		return enableControls ? { controlUp, controlDown } : {};
 	}
 
 	calculateDelimeter () {
 		const { enableDelimeter, delimeter } = this.props;
-
-		if (!enableDelimeter) {
-			return false;
-		}
-
-		return delimeter;
+		return enableDelimeter ? delimeter : false;
 	}
 
 	calculateIndexes () {
@@ -119,41 +92,28 @@ export default class Paginator extends Component {
 			visibleAmount: visiblePickers });
 	}
 
-	calculateDelimeterVisibility (indexes) {
-		const { visiblePickers } = this.state;
-
-		return needDelimeter(indexes, visiblePickers);
-	}
-
 	calculatePickerSequence () {
 		const indexes = this.calculateIndexes();
-		const labels = this.calculateLabels();
-		const controls = this.calculateControls();
-		const delimeter = this.calculateDelimeter();
 
-		const { currentIndex, allPickers } = this.state;
-
-		const isDelimeterViseble = this.calculateDelimeterVisibility(indexes);
+		const { currentIndex, allPickers, visiblePickers } = this.state;
 
 		return producePickerMap({
-			isDelimeterViseble,
+			withLast: indexes.length !== visiblePickers,
+			labels: this.calculateLabels(),
+			delimeter: this.calculateDelimeter(),
+			controls: this.calculateControls(),
 			currentIndex,
 			indexes,
-			labels,
-			delimeter,
-			controls,
 			lastIndex: allPickers,
 		});
 	}
 
 	generatePickers () {
-		const { delimeter, customPicker, color } = this.props;
+		const { delimeter, customPicker } = this.props;
 
 		const PickerComponent = customPicker;
 
 		const sequence = this.calculatePickerSequence();
-
-		console.log(sequence);
 
 		return sequence.map(({ value, disabled, picked, pickerIndex }) => {
 				if (value === delimeter) {
@@ -166,7 +126,6 @@ export default class Paginator extends Component {
 					value={value}
 					disabled={disabled}
 					picked={picked}
-					color={color}
 					onPickerClick={this.onPickerChange}
 				/>)
 			});
@@ -193,7 +152,7 @@ export default class Paginator extends Component {
 
 	render () {
 		return (
-			<div className='paginator' style={this._defaultStyle} >
+			<div className='paginator' >
 				{ this.generateInputControl() }
 				{ this.generatePickers() }
 			</div>)
@@ -207,7 +166,6 @@ Paginator.defaultProps = {
 
 	/** customization **/
 	customPicker: Picker,
-	color: 'blue',
 
 	/** delimeter configuration **/
 	enableDelimeter: true,
@@ -234,7 +192,7 @@ Paginator.defaultProps = {
 
 Paginator.propTypes = {
 	/** mandatory prop **/
-	amount: PropTypes.number,
+	amount: PropTypes.number.isRequired,
 
 	/** assets configuration **/
 	valuePerPage: PropTypes.number,
@@ -242,7 +200,6 @@ Paginator.propTypes = {
 
 	/** customization **/
 	customPicker: PropTypes.any,
-	color: PropTypes.string,
 
 	/** delimeter configuration **/
 	enableDelimeter: PropTypes.bool,
