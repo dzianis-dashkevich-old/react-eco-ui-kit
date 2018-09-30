@@ -1,3 +1,5 @@
+import { pipe, assert } from './functional';
+
 export const isValueInvalid = value => !value || value < 1;
 
 export const calculateAllAvailablePickers = (all, perPage) =>
@@ -90,7 +92,17 @@ export const calculateIndexes = (
 export const addValue = (value) => (arr = []) => value ? [...arr, value] : arr;
 export const addValues = (values = []) => (arr = []) => values.length ? arr.concat(values) : arr;
 
-export const producePickerMap = ({ withLast, currentIndex, lastIndex, indexes, labels, controls, delimeter }) => {
+export const producePickerMap = ({
+	withLast,
+	currentIndex,
+	lastIndex,
+	indexes = [],
+	labels = {},
+	controls = {},
+	delimeter,
+} = {}) => {
+	assert(lastIndex, 'last index should be provided');
+
 	return pipe(
 		addValue(labels.firstLabel),
 		addValue(controls.controlDown),
