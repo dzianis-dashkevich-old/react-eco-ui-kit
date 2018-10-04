@@ -4,9 +4,10 @@ import PropTypes from 'prop-types';
 import { EMPTY } from './consts/core';
 import { DELIMETER, DEFAULT_DELIMETER } from './consts/delimeter';
 
+import { skipEmptyClassNames } from './utils/string';
 
 const Delimeter = ({ value, className }) => (
-	<span className={`${DELIMETER} ${className}`} >
+	<span className={skipEmptyClassNames([DELIMETER, className])} >
 		{value}
 	</span>
 );
