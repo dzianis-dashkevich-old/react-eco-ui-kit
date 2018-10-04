@@ -1,45 +1,58 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { noop } from './utils/functional';
-import { basicNumberValidator } from './utils/input';
+import { noop, identity } from './utils/functional';
+
+import { DEFAULT_VALUE, EMPTY } from './consts/core';
+import { VALID, INVALID, INPUT } from './consts/input';
 
 export default class Input extends Component {
 	constructor (props) {
 		super(props);
 
-		const { currentIndex } = this.props;
+		const { value, validator } = this.props;
 
-		this.state = { isValid: true, value: currentIndex }
+		const isValid = Boolean(validator(value));
+
+		this.state = { isValid, value };
 	}
 
-	componentWillReceiveProps ({ currentIndex }) {
-		this.setState({ value: currentIndex });
+	componentDidUpdate ({ value }) {
+		this.state.value !== value && this.setState({ value });
 	}
 
 	onInputchange = ({ target }) => {
-		const { validator, maxValue, onInputChange, currentIndex } = this.props;
-		const { value } = target;
+		const { validator, onInputChange, value } = this.props;
 
 		let isValid = false;
 
-		if (validator(value, maxValue)) {
+		const receivedValue = target.value;
+
+		if (validator(receivedValue)) {
 			isValid = true;
 
-			const casted = Number(value);
-			const needdToCallChange = currentIndex !== casted;
+			if (value == receivedValue) {
+				return;
+			}
 
-			needdToCallChange && onInputChange(casted);
+			onInputChange(receivedValue);
+			this.setState({ value: receivedValue });
 		}
 
-		this.setState({ isValid, value });
+		this.setState({ isValid });
 	};
 
 	render () {
-		const { value } = this.state;
+		const { className } = this.props;
+		const { value, isValid } = this.state;
+
+		const validClassName = isValid ? VALID : INVALID;
+		const inputClassName = `${INPUT} ${validClassName} ${className}`;
 
 		return (
 			<input
+				className={inputClassName}
+				data-valid={isValid}
 				onChange={this.onInputchange}
 				value={value}
 			/>)
@@ -48,12 +61,14 @@ export default class Input extends Component {
 
 Input.defaultProps = {
 	onInputChange: noop,
-	validator: basicNumberValidator,
+	validator: identity,
+	className: EMPTY,
+	value: DEFAULT_VALUE,
 };
 
 Input.propTypes = {
-	maxValue: PropTypes.number,
+	className: PropTypes.string,
 	validator: PropTypes.func,
 	onInputChange: PropTypes.func,
-	currentIndex: PropTypes.any,
+	value: PropTypes.any,
 };
