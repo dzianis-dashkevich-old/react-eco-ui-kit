@@ -3,27 +3,29 @@ import PropTypes from 'prop-types';
 
 import { noop } from './utils/functional';
 
+import { DEFAULT_VALUE, EMPTY } from './consts/core';
 import { PICKER_DISABLED, PICKER_PICKED, PICKER } from './consts/picker';
 
 export default class Picker extends Component {
 	onClick = () => {
-		const { onPickerClick, pickerIndex, disabled } = this.props;
+		const { onPickerClick, disabled, value } = this.props;
 
-		!disabled && onPickerClick(pickerIndex);
+		!disabled && onPickerClick(value);
 	};
 
 	render () {
-		const { value, disabled, picked } = this.props;
+		const { value, disabled, picked, className } = this.props;
 
-		const disabledClassName = disabled ? PICKER_DISABLED : '';
-		const pickedClassName = picked ? PICKER_PICKED : '';
+		const disabledClassName = disabled ? PICKER_DISABLED : EMPTY;
+		const pickedClassName = picked ? PICKER_PICKED : EMPTY;
 
-		const classNames = `${PICKER} ${disabledClassName} ${pickedClassName}`;
+		const pickerClassName = `${PICKER} ${disabledClassName} ${pickedClassName} ${className}`;
 
 		return (
 			<div
-				style={this._defaultStyle}
-				className={classNames}
+				className={pickerClassName}
+				data-disabled={disabled}
+				data-picked={picked}
 				onClick={ this.onClick }
 			>
 				{ value }
@@ -36,13 +38,14 @@ Picker.defaultProps = {
 	onPickerClick: noop,
 	disabled: false,
 	picked: false,
-	value: 'def',
+	value: DEFAULT_VALUE,
+	className: EMPTY,
 };
 
 Picker.propTypes = {
+	className: PropTypes.string,
 	disabled: PropTypes.bool,
 	picked: PropTypes.bool,
 	value: PropTypes.any,
 	onPickerClick: PropTypes.func,
-	pickerIndex: PropTypes.any,
 };
