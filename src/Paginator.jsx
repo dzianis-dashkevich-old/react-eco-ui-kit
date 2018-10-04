@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import Picker from './Picker';
 import Input from './Input';
+import Delimeter from './Delimeter';
 
 import {
 	calculateAllAvailablePickers,
@@ -10,25 +11,34 @@ import {
 	producePickerMap,
 	calculateIndexes,
 } from './utils/paginator';
+
 import { noop } from './utils/functional';
+
+import { EMPTY } from './consts/core';
+import { FIRST, LAST, LABEL } from './consts/labels';
+import { CONTROL_UP, CONTROL_DOWN, CONTROL } from './consts/controls';
+import { 
+	PAGINATOR,
+	DEFAULT_INIT_INDEX,
+	DEFAULT_DELIMETER,
+	DEFAULT_VALUE_PER_PAGE,
+	DEFAULT_AMOUNT_PICKERS_TO_SHOW,
+	DEFAULT_ENABLE,
+} from './consts/paginator';
 
 export default class Paginator extends Component {
 	constructor (props) {
 		super(props);
 
 		const { valuePerPage, amount, amountPickersToShow, initIndex } = props;
-
 		const allPickers = calculateAllAvailablePickers(amount, valuePerPage);
-		const visiblePickers = calculateVisiblePickers(allPickers, amountPickersToShow);
-
-		const initialDirection = { up: true, down: false };
 
 		this.state = {
+			currentIndex: initIndex,
 			valuePerPage,
 			allPickers,
-			visiblePickers,
-			currentIndex: initIndex,
-			direction: initialDirection,
+			visiblePickers: calculateVisiblePickers(allPickers, amountPickersToShow),
+			direction: { up: true, down: false },
 		};
 	}
 
@@ -40,8 +50,26 @@ export default class Paginator extends Component {
 		this.setState({ direction: newDirection });
 	}
 
-	onPickerChange = (index) => {
-		const { controlUp, controlDown } = this.props;
+	convertValueToIndex (value) {
+		const { firstLabel, lastLabel, controlUp, controlDown } = this.props;
+		const { allPickers, currentIndex } = this.state;
+
+		switch (value) {
+			case firstLabel:
+				return 1;
+			case lastLabel:
+				return allPickers;
+			case controlUp:
+				return currentIndex + 1;
+			case controlDown:
+				return currentIndex - 1;
+			default:
+				return value;
+		}
+	}
+
+	onPickerChange = (value) => {
+		const index = this.convertValueToIndex(value);
 		const { currentIndex } = this.state;
 
 		if (index === currentIndex) {
@@ -50,19 +78,9 @@ export default class Paginator extends Component {
 			return;
 		}
 
-		let indexToUpdate = index;
+		this.setState({ currentIndex: index });
 
-		if (index === controlUp) {
-			indexToUpdate = currentIndex + 1;
-		}
-
-		if (index === controlDown) {
-			indexToUpdate = currentIndex - 1;
-		}
-
-		this.setState({ currentIndex: indexToUpdate });
-
-		this.props.onPickerChange(indexToUpdate);
+		this.props.onPickerChange(index);
 	};
 
 	calculateLabels () {
@@ -76,8 +94,8 @@ export default class Paginator extends Component {
 	}
 
 	calculateDelimeter () {
-		const { enableDelimeter, delimeter } = this.props;
-		return enableDelimeter ? delimeter : false;
+		const { enableDelimeter, delimeterValue } = this.props;
+		return enableDelimeter ? delimeterValue : false;
 	}
 
 	calculateIndexes () {
@@ -92,7 +110,7 @@ export default class Paginator extends Component {
 			visibleAmount: visiblePickers });
 	}
 
-	calculatePickerSequence () {
+	calculateSequence () {
 		const indexes = this.calculateIndexes();
 
 		const { currentIndex, allPickers, visiblePickers } = this.state;
@@ -108,86 +126,138 @@ export default class Paginator extends Component {
 		});
 	}
 
-	generatePickers () {
-		const { delimeter, customPicker } = this.props;
+	isDelimeter (value) {
+		return value === this.props.delimeterValue;
+	}
 
+	isControl (value) {
+		return value === this.props.controlUp || value === this.props.controlDown;
+	}
+
+	isLabel (value) {
+		return value === this.firstLabel || value === this.lastLabel;
+	}
+
+	generateDelimeter (value) {
+		const { delimeterClassName } = this.props;
+		return (<Delimeter key={value} className={delimeterClassName} value={value} />);
+	}
+
+	generatePicker (value, disabled, picked, classNameValue) {
+		const { customPicker, pickerClassName } = this.props;
 		const PickerComponent = customPicker;
+		const className = classNameValue || pickerClassName;
 
-		const sequence = this.calculatePickerSequence();
+		return (<PickerComponent
+			key={`${value}${disabled}${picked}`}
+			className={className}
+			value={value}
+			disabled={disabled}
+			picked={picked}
+			onPickerClick={this.onPickerChange}
+		/>);
+	}
 
-		return sequence.map(({ value, disabled, picked, pickerIndex }) => {
-				if (value === delimeter) {
-					return (<span key={value} >{value}</span>);
+	generateSequence () {
+		return this.calculateSequence()
+			.map(({ value, disabled, picked }) => {
+				if (this.isDelimeter(value)) {
+					return this.generateDelimeter(value);
 				}
 
-				return (<PickerComponent
-					key={`${value}${disabled}${picked}`}
-					pickerIndex={pickerIndex}
-					value={value}
-					disabled={disabled}
-					picked={picked}
-					onPickerClick={this.onPickerChange}
-				/>)
+				let className = null;
+
+				if (this.isLabel(value)) {
+					const { labelClassName } = this.props;
+					className = `${LABEL} ${labelClassName}`;
+				}
+
+				if (this.isControl(value)) {
+					const { controlClassName } = this.props;
+					className = `${CONTROL} ${controlClassName}`;
+				}
+
+				return this.generatePicker(value, disabled, picked, className);
 			});
 	}
 
+	validateInput = (value) => {
+		const castToNumber = Number(value);
+		return !isNaN(castToNumber)
+			&& isFinite(castToNumber)
+			&& castToNumber > 0
+			&& castToNumber <= this.state.allPickers; 
+	}
+
 	generateInputControl () {
-		const { enableInputControl, customInput, inputControlValidator } = this.props;
-		const { currentIndex, allPickers } = this.state;
+		const { enableInputControl, customInput, inputControlValidator, inputClassName } = this.props;
+		const { currentIndex } = this.state;
 
 		if (!enableInputControl) {
 			return null;
 		}
 
 		const InputComponent = customInput;
+		const validator = inputControlValidator || this.validateInput;
 
 		return (<InputComponent
-			maxValue={allPickers}
-			validator={inputControlValidator}
+			className={inputClassName}
+			validator={validator}
 			onInputChange={this.onPickerChange}
-			currentIndex={currentIndex}
+			value={currentIndex}
 		/>)
 
 	}
 
 	render () {
+		const { className } = this.props;
+
+		const paginatorClassName = `${PAGINATOR} ${className}`;
+
 		return (
-			<div className='paginator' >
+			<div className={ paginatorClassName } >
 				{ this.generateInputControl() }
-				{ this.generatePickers() }
+				{ this.generateSequence() }
 			</div>)
 	}
 }
 
 Paginator.defaultProps = {
 	/** assets configuration **/
-	valuePerPage: 10,
-	amountPickersToShow: 4,
+	valuePerPage: DEFAULT_VALUE_PER_PAGE,
+	amountPickersToShow: DEFAULT_AMOUNT_PICKERS_TO_SHOW,
+	className: EMPTY,
 
 	/** customization **/
 	customPicker: Picker,
+	pickerClassName: EMPTY,
 
 	/** delimeter configuration **/
-	enableDelimeter: true,
-	delimeter: '...',
+	enableDelimeter: DEFAULT_ENABLE.DELIMETER,
+	customDelimeter: Delimeter,
+	delimeterValue: DEFAULT_DELIMETER,
+	delimeterClassName: EMPTY,
 
 	/** labels configuration **/
-	enableLabels: true,
-	firstLabel: 'First',
-	lastLabel: 'Last',
+	enableLabels: DEFAULT_ENABLE.LABELS,
+	firstLabel: FIRST,
+	lastLabel: LAST,
+	labelClassName: EMPTY,
 
 	/** controls configuration **/
-	enableControls: true,
-	controlUp: '>',
-	controlDown: '<',
+	enableControls: DEFAULT_ENABLE.CONTROLS,
+	controlUp: CONTROL_UP,
+	controlDown: CONTROL_DOWN,
+	controlClassName: EMPTY,
 
 	/** input configuration **/
-	enableInputControl: true,
+	enableInputControl: DEFAULT_ENABLE.INPUT_CONTROL,
 	customInput: Input,
+	inputClassName: EMPTY,
 
 	/** base configuration **/
 	onPickerChange: noop,
-	initIndex: 1,
+	initIndex: DEFAULT_INIT_INDEX,
 };
 
 Paginator.propTypes = {
@@ -197,28 +267,35 @@ Paginator.propTypes = {
 	/** assets configuration **/
 	valuePerPage: PropTypes.number,
 	amountPickersToShow: PropTypes.number,
+	className: PropTypes.string,
 
 	/** customization **/
 	customPicker: PropTypes.any,
+	pickerClassName: PropTypes.string,
 
 	/** delimeter configuration **/
 	enableDelimeter: PropTypes.bool,
-	delimeter: PropTypes.string,
+	customDelimeter: PropTypes.any,
+	delimeterValue: PropTypes.string,
+	delimeterClassName: PropTypes.string,
 
 	/** labels configuration **/
 	enableLabels: PropTypes.bool,
 	firstLabel: PropTypes.string,
 	lastLabel: PropTypes.string,
+	labelClassName: PropTypes.string,
 
 	/** controls configuration **/
 	enableControls: PropTypes.bool,
 	controlUp: PropTypes.any,
 	controlDown: PropTypes.any,
+	controlClassName: PropTypes.string,
 
 	/** input configuration **/
 	enableInputControl: PropTypes.bool,
 	customInput: PropTypes.any,
 	inputControlValidator: PropTypes.func,
+	inputClassName: PropTypes.string,
 
 	/** base configuration **/
 	onPickerChange: PropTypes.func,
