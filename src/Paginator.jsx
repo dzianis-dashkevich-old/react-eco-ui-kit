@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import Picker from './Picker';
 import Input from './Input';
 import Delimeter from './Delimeter';
+import Control from './Control';
+import Label from './Label';
 
 import {
 	calculateAllAvailablePickers,
@@ -13,10 +15,11 @@ import {
 } from './utils/paginator';
 
 import { noop } from './utils/functional';
+import { skipEmptyClassNames } from './utils/string';
 
 import { EMPTY } from './consts/core';
-import { FIRST, LAST, LABEL } from './consts/labels';
-import { CONTROL_UP, CONTROL_DOWN, CONTROL } from './consts/controls';
+import { FIRST, LAST } from './consts/labels';
+import { CONTROL_UP, CONTROL_DOWN } from './consts/controls';
 import { 
 	PAGINATOR,
 	DEFAULT_INIT_INDEX,
@@ -135,27 +138,53 @@ export default class Paginator extends Component {
 	}
 
 	isLabel (value) {
-		return value === this.firstLabel || value === this.lastLabel;
+		return value === this.props.firstLabel || value === this.props.lastLabel;
 	}
 
 	generateDelimeter (value) {
-		const { delimeterClassName } = this.props;
-		return (<Delimeter key={value} className={delimeterClassName} value={value} />);
+		const { customDelimeterComponent, delimeterClassName } = this.props;
+		const DelimeterComponent = customDelimeterComponent;
+		return (<DelimeterComponent key={value} className={delimeterClassName} value={value} />);
 	}
 
-	generatePicker (value, disabled, picked, classNameValue) {
-		const { customPicker, pickerClassName } = this.props;
-		const PickerComponent = customPicker;
-		const className = classNameValue || pickerClassName;
+	generatePicker (value, disabled, picked) {
+		const { customPickerComponent, pickerClassName } = this.props;
+		const PickerComponent = customPickerComponent;
 
 		return (<PickerComponent
 			key={`${value}${disabled}${picked}`}
-			className={className}
+			className={pickerClassName}
 			value={value}
 			disabled={disabled}
 			picked={picked}
 			onPickerClick={this.onPickerChange}
 		/>);
+	}
+
+	generateControl (value, disabled) {
+		const { customControlComponent, controlClassName } = this.props;
+		const ControlComponent = customControlComponent;
+
+		return (<ControlComponent 
+			key={`${value}${disabled}`}
+			className={controlClassName}
+			value={value}
+			disabled={disabled}
+			onControlClick={this.onPickerChange}
+			/>);
+	}
+
+	generateLabel (value, disabled) {
+		const { customLabelComponent, labelClassName } = this.props;
+		const LabelComponent = customLabelComponent;
+
+		return (<LabelComponent 
+			key={`${value}${disabled}`}
+			className={labelClassName}
+			value={value}
+			disabled={disabled}
+			onLabelClick={this.onPickerChange}
+			/>);
 	}
 
 	generateSequence () {
@@ -165,19 +194,15 @@ export default class Paginator extends Component {
 					return this.generateDelimeter(value);
 				}
 
-				let className = null;
-
 				if (this.isLabel(value)) {
-					const { labelClassName } = this.props;
-					className = `${LABEL} ${labelClassName}`;
+					return this.generateLabel(value, disabled);
 				}
 
 				if (this.isControl(value)) {
-					const { controlClassName } = this.props;
-					className = `${CONTROL} ${controlClassName}`;
+					return this.generateControl(value, disabled);
 				}
 
-				return this.generatePicker(value, disabled, picked, className);
+				return this.generatePicker(value, disabled, picked);
 			});
 	}
 
@@ -190,16 +215,15 @@ export default class Paginator extends Component {
 	}
 
 	generateInputControl () {
-		const { enableInputControl, customInput, inputControlValidator, inputClassName } = this.props;
+		const { enableInputControl, customInputComponent, inputControlValidator, inputClassName } = this.props;
 		const { currentIndex } = this.state;
 
 		if (!enableInputControl) {
 			return null;
 		}
 
-		const InputComponent = customInput;
+		const InputComponent = customInputComponent;
 		const validator = inputControlValidator || this.validateInput;
-
 		return (<InputComponent
 			className={inputClassName}
 			validator={validator}
@@ -212,10 +236,8 @@ export default class Paginator extends Component {
 	render () {
 		const { className } = this.props;
 
-		const paginatorClassName = `${PAGINATOR} ${className}`;
-
 		return (
-			<div className={ paginatorClassName } >
+			<div className={ skipEmptyClassNames([PAGINATOR, className]) } >
 				{ this.generateInputControl() }
 				{ this.generateSequence() }
 			</div>)
@@ -229,30 +251,32 @@ Paginator.defaultProps = {
 	className: EMPTY,
 
 	/** customization **/
-	customPicker: Picker,
+	customPickerComponent: Picker,
 	pickerClassName: EMPTY,
 
 	/** delimeter configuration **/
 	enableDelimeter: DEFAULT_ENABLE.DELIMETER,
-	customDelimeter: Delimeter,
+	customDelimeterComponent: Delimeter,
 	delimeterValue: DEFAULT_DELIMETER,
 	delimeterClassName: EMPTY,
 
 	/** labels configuration **/
 	enableLabels: DEFAULT_ENABLE.LABELS,
+	customLabelComponent: Label,
 	firstLabel: FIRST,
 	lastLabel: LAST,
 	labelClassName: EMPTY,
 
 	/** controls configuration **/
 	enableControls: DEFAULT_ENABLE.CONTROLS,
+	customControlComponent: Control,
 	controlUp: CONTROL_UP,
 	controlDown: CONTROL_DOWN,
 	controlClassName: EMPTY,
 
 	/** input configuration **/
 	enableInputControl: DEFAULT_ENABLE.INPUT_CONTROL,
-	customInput: Input,
+	customInputComponent: Input,
 	inputClassName: EMPTY,
 
 	/** base configuration **/
@@ -270,30 +294,32 @@ Paginator.propTypes = {
 	className: PropTypes.string,
 
 	/** customization **/
-	customPicker: PropTypes.any,
+	customPickerComponent: PropTypes.any,
 	pickerClassName: PropTypes.string,
 
 	/** delimeter configuration **/
 	enableDelimeter: PropTypes.bool,
-	customDelimeter: PropTypes.any,
+	customDelimeterComponent: PropTypes.any,
 	delimeterValue: PropTypes.string,
 	delimeterClassName: PropTypes.string,
 
 	/** labels configuration **/
 	enableLabels: PropTypes.bool,
+	customLabelComponent: PropTypes.any,
 	firstLabel: PropTypes.string,
 	lastLabel: PropTypes.string,
 	labelClassName: PropTypes.string,
 
 	/** controls configuration **/
 	enableControls: PropTypes.bool,
+	customControlComponent: PropTypes.any,
 	controlUp: PropTypes.any,
 	controlDown: PropTypes.any,
 	controlClassName: PropTypes.string,
 
 	/** input configuration **/
 	enableInputControl: PropTypes.bool,
-	customInput: PropTypes.any,
+	customInputComponent: PropTypes.any,
 	inputControlValidator: PropTypes.func,
 	inputClassName: PropTypes.string,
 
