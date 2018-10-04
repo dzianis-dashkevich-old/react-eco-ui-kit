@@ -126,8 +126,7 @@ export const producePickerMap = ({
 
 		const disabled = (disableFirst && isFirst) || (disableLast && isLast);
 		const picked = value === currentIndex;
-		const pickerIndex = isFirsLabel ? 1 : isLastLabel ? lastIndex : value;
 
-		return { value, disabled, picked, pickerIndex };
+		return { value, disabled, picked };
 	});
 };
