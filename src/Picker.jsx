@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { noop } from './utils/functional';
+import { skipEmptyClassNames } from './utils/string';
 
-import { DEFAULT_VALUE, EMPTY } from './consts/core';
-import { PICKER_DISABLED, PICKER_PICKED, PICKER } from './consts/picker';
+import { DEFAULT_VALUE, PICKED, DISABLED, EMPTY } from './consts/core';
+import { PICKER } from './consts/picker';
 
 export default class Picker extends Component {
 	onClick = () => {
@@ -16,14 +17,12 @@ export default class Picker extends Component {
 	render () {
 		const { value, disabled, picked, className } = this.props;
 
-		const disabledClassName = disabled ? PICKER_DISABLED : EMPTY;
-		const pickedClassName = picked ? PICKER_PICKED : EMPTY;
-
-		const pickerClassName = `${PICKER} ${disabledClassName} ${pickedClassName} ${className}`;
+		const disabledClassName = disabled ? DISABLED : EMPTY;
+		const pickedClassName = picked ? PICKED : EMPTY;
 
 		return (
 			<div
-				className={pickerClassName}
+				className={skipEmptyClassNames([PICKER, disabledClassName, pickedClassName, className])}
 				data-disabled={disabled}
 				data-picked={picked}
 				onClick={ this.onClick }

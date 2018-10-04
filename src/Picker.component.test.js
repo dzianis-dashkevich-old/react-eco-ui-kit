@@ -3,8 +3,8 @@ import { shallow } from 'enzyme';
 
 import Picker from './Picker';
 
-import { DEFAULT_VALUE } from './consts/core';
-import { PICKER_DISABLED, PICKER_PICKED, PICKER } from './consts/picker';
+import { DEFAULT_VALUE, PICKED, DISABLED } from './consts/core';
+import { PICKER } from './consts/picker';
 
 describe('Picker spec', () => {
 	it('renders div with default value', () => {
@@ -31,8 +31,8 @@ describe('Picker spec', () => {
 		const divs = wrapper.find('div');
 		const props = divs.props();
 
-		expect(divs.hasClass(PICKER_DISABLED)).toBeTruthy();
-		expect(divs.hasClass(PICKER_PICKED)).toBeTruthy();
+		expect(divs.hasClass(DISABLED)).toBeTruthy();
+		expect(divs.hasClass(PICKED)).toBeTruthy();
 
 		expect(props['data-picked']).toBeTruthy();
 		expect(props['data-disabled']).toBeTruthy();
