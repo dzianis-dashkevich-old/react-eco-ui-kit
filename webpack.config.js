@@ -7,8 +7,6 @@ const dist = resolve(__dirname, 'dist');
 const uiKitUtils = resolve(src, 'utils');
 const uiKitComponents = resolve(src, 'components');
 
-console.log(uiKitComponents);
-
 const entry = indexJs;
 const output = {
 	path: dist,
