@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { noop, identity } from './utils/functional';
+import { skipEmptyClassNames } from './utils/string';
 
 import { DEFAULT_VALUE, EMPTY } from './consts/core';
 import { VALID, INVALID, INPUT } from './consts/input';
@@ -11,14 +12,8 @@ export default class Input extends Component {
 		super(props);
 
 		const { value, validator } = this.props;
-
 		const isValid = Boolean(validator(value));
-
-		this.state = { isValid, value };
-	}
-
-	componentDidUpdate ({ value }) {
-		this.state.value !== value && this.setState({ value });
+		this.state = { isValid };
 	}
 
 	onInputchange = ({ target }) => {
@@ -36,22 +31,20 @@ export default class Input extends Component {
 			}
 
 			onInputChange(receivedValue);
-			this.setState({ value: receivedValue });
 		}
 
 		this.setState({ isValid });
 	};
 
 	render () {
-		const { className } = this.props;
-		const { value, isValid } = this.state;
+		const { className, value } = this.props;
+		const { isValid } = this.state;
 
 		const validClassName = isValid ? VALID : INVALID;
-		const inputClassName = `${INPUT} ${validClassName} ${className}`;
 
 		return (
 			<input
-				className={inputClassName}
+				className={skipEmptyClassNames([INPUT, validClassName, className])}
 				data-valid={isValid}
 				onChange={this.onInputchange}
 				value={value}

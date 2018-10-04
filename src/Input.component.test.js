@@ -75,22 +75,11 @@ describe('Input spec', () => {
 
 	it('should update ui after setState', () => {
 		const simulatedValue = 12;
-		const wrapper = mount(<Input />);
+		const wrapper = mount(<Input validator={(val) => val < simulatedValue} />);
+		const inputs = wrapper.find('input');
 
-		let inputs = wrapper.find('input');
+		inputs.simulate('change', { target: { value: simulatedValue } });
 
-		expect(wrapper.state().value).toBe(DEFAULT_VALUE);
-		expect(inputs.props().value).toBe(DEFAULT_VALUE);
-
-		wrapper.setState({ value: simulatedValue, isValid: false });
-
-		//TODO simulate event instead of setState trigger, to check ui changes, 
-		//after enzime fix track state change issue
-		// inputs.simulate('change', { target: { value: simulatedValue } });
-
-		inputs = wrapper.find('input');
-
-		expect(inputs.props().value).toBe(simulatedValue);
 		expect(inputs.hasClass(INVALID)).toBeTruthy();
 		expect(inputs.hasClass(VALID)).toBeFalsy();
 	});
@@ -100,41 +89,5 @@ describe('Input spec', () => {
 		const wrapper = mount(<Input className={one} />);
 
 		expect(wrapper.find('input').hasClass(one));
-	});
-
-	it('should call setState when change received', () => {
-		const simulatedValue = 12;
-		const wrapper = mount(<Input />);
-		const inputs = wrapper.find('input');
-
-		const mockSetState = jest.fn();
-
-		wrapper.instance().setState = mockSetState;
-
-		inputs.simulate('change', { target: { value: simulatedValue } });
-
-		expect(mockSetState).toHaveBeenCalledTimes(2);
-		expect(mockSetState).toHaveBeenNthCalledWith(1, { value: simulatedValue });
-		expect(mockSetState).toHaveBeenNthCalledWith(2, { isValid: true });
-
-		const nextValue = 13;
-
-		wrapper.instance().componentDidUpdate({ value: nextValue });
-
-		expect(mockSetState).toHaveBeenNthCalledWith(3, { value: nextValue });
-	});
-
-	it('should not call setState if value equeals', () => {
-		const value = 13;
-		const wrapper = mount(<Input />);
-
-		const mockSetState = jest.fn();
-
-		wrapper.instance().state.value = value;
-		wrapper.instance().setState = mockSetState;
-
-		wrapper.instance().componentDidUpdate({ value });
-
-		expect(mockSetState).not.toHaveBeenCalledWith({ value });
 	});
 });
