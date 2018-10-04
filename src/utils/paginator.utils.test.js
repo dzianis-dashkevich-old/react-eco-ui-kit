@@ -11,7 +11,7 @@ import {
 	producePickerMap,
 } from './paginator';
 
-const wrapPicker = (value) => ({ value, disabled: false, picked: false, pickerIndex: value });
+const wrapPicker = (value) => ({ value, disabled: false, picked: false });
 const wrapPickers = (values = []) => values.map(wrapPicker);
 
 describe('paginator utils spec', () => {
@@ -327,22 +327,18 @@ describe('paginator utils spec', () => {
 			// indexes, first label
 			const indexesAndFirstLabel = producePickerMap({ indexes, labels: onlyFirstLable, lastIndex });
 			const expectedIndexesAndFirstLabel = wrapPickers([firstLabel, ...indexes]);
-			expectedIndexesAndFirstLabel[0].pickerIndex = 1;
 
 			expect(indexesAndFirstLabel).toEqual(expectedIndexesAndFirstLabel);
 
 			// indexes, last label
 			const indexesAndLastLabels = producePickerMap({ indexes, labels: onlyLastLabel, lastIndex });
 			const expectedIndexesAndLastLabels = wrapPickers([...indexes, lastLabel]);
-			expectedIndexesAndLastLabels[expectedIndexesAndLastLabels.length - 1].pickerIndex = lastIndex;
 
 			expect(indexesAndLastLabels).toEqual(expectedIndexesAndLastLabels);
 
 			//indexes, all labels
 			const indexesAndAllLabels = producePickerMap({ indexes, labels, lastIndex });
 			const expectedIndexesAndAllLabels = wrapPickers([firstLabel, ...indexes, lastLabel]);
-			expectedIndexesAndAllLabels[0].pickerIndex = 1;
-			expectedIndexesAndAllLabels[expectedIndexesAndAllLabels.length - 1].pickerIndex = lastIndex;
 
 			expect(indexesAndAllLabels).toEqual(expectedIndexesAndAllLabels);
 
