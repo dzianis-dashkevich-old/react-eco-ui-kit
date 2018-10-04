@@ -1,4 +1,9 @@
 language: node_js
 node_js: lts/*
 script:
-- npm test
+  - npm test
+after_success:
+  - npx codecov
+cache:
+  directories:
+  - "$HOME/.npm"
