@@ -9,9 +9,9 @@ import { LABEL } from './consts/labels';
 
 export default class Label extends Component {
 	onClick = () => {
-		const { onLabelClick, disabled, value } = this.props;
+		const { onClick, disabled, value } = this.props;
 
-		!disabled && onLabelClick(value);
+		!disabled && onClick(value);
 	};
 
 	render () {
@@ -31,7 +31,7 @@ export default class Label extends Component {
 }
 
 Label.defaultProps = {
-	onLabelClick: noop,
+	onClick: noop,
 	disabled: false,
 	value: DEFAULT_VALUE,
 	className: EMPTY,
@@ -41,5 +41,5 @@ Label.propTypes = {
 	className: PropTypes.string,
 	disabled: PropTypes.bool,
 	value: PropTypes.any,
-	onLabelClick: PropTypes.func,
+	onClick: PropTypes.func,
 };

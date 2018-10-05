@@ -9,7 +9,7 @@ import { LABEL } from './consts/labels';
 describe('Label spec', () => {
 	it('renders with default values', () => {
 		const wrapper = shallow(<Label />);
-		
+
 		const divs = wrapper.find('div');
 
 		expect(divs).toHaveLength(1);
@@ -53,7 +53,7 @@ describe('Label spec', () => {
 		const value = 12;
 		const handler = jest.fn();
 
-		const wrapper = shallow(<Label value={value} onLabelClick={handler} />);
+		const wrapper = shallow(<Label value={value} onClick={handler} />);
 
 		wrapper.find('div').simulate('click');
 		expect(handler).toHaveBeenCalledTimes(1);
@@ -63,7 +63,7 @@ describe('Label spec', () => {
 	it('should not invoke provided handler if disabled', () => {
 		const handler = jest.fn();
 
-		const wrapper = shallow(<Label onLabelClick={handler} disabled={true} />);
+		const wrapper = shallow(<Label onClick={handler} disabled={true} />);
 		wrapper.find('div').simulate('click');
 		expect(handler).not.toHaveBeenCalled();
 	});
