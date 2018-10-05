@@ -5,6 +5,25 @@
 [![npm](https://img.shields.io/npm/v/react-eco-ui-kit.svg)](https://www.npmjs.com/package/react-eco-ui-kit)
 
 
+##### Usage:
+
+```javascript
+import EcoUiKit from 'react-eco-ui-kit';
+
+const { utils, consts, components } = EcoUiKit;
+const { Paginator } = components;
+
+//or
+import { components, utils, consts } from 'react-eco-ui-kit';
+
+const { Picker } = components;
+
+//or
+import { Paginator, Input, Picker } from 'react-eco-ui-kit';
+
+```
+
+
 ### Components:
 
 * ### Paginator

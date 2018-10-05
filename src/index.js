@@ -1,9 +1,9 @@
-import Picker from './Picker';
-import Paginator from './Paginator';
-import Input from './Input';
-import Delimeter from './Delimeter';
-import Control from './Control';
-import Label from './Label';
+import PickerComponent from './Picker';
+import PaginatorComponent from './Paginator';
+import InputComponent from './Input';
+import DelimeterComponent from './Delimeter';
+import ControlComponent from './Control';
+import LabelComponent from './Label';
 
 import * as CORE from './consts/core';
 import * as INPUT from './consts/input';
@@ -16,6 +16,13 @@ import * as DELIMETER from './consts/delimeter';
 import * as functional from './utils/functional';
 import * as paginator from './utils/paginator';
 import * as string from './utils/string';
+
+export const Picker = PickerComponent;
+export const Paginator = PaginatorComponent;
+export const Input = InputComponent;
+export const Delimeter = DelimeterComponent;
+export const Control = ControlComponent;
+export const Label = LabelComponent;
 
 export const consts = { CORE, INPUT, PICKER, PAGINATOR, LABELS, CONTROLS, DELIMETER };
 export const utils = { functional, paginator, string };
