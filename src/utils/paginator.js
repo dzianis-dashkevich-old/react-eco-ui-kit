@@ -1,4 +1,4 @@
-import { pipe, assert } from './functional';
+import { pipe } from './functional';
 
 export const isValueInvalid = value => !value || value < 1;
 
@@ -41,7 +41,7 @@ export const createSequence = (from, to, step = 1) => {
 
 export const calculateIndexesUp = (currentIndex, indexCount, lastIndex) => {
 	if (currentIndex > lastIndex) {
-		throw new Error('Current index can`t be more then last index');
+		return [];
 	}
 
 	const withoutLast = currentIndex + indexCount < lastIndex;
@@ -69,22 +69,34 @@ export const calculateIndexes = (
 	calIndexDown = calculateIndexesDown
 	) => {
 	if (up && down) {
-		throw new Error("only one direction should be provided");
+		return [];
 	}
 
 	if (isValueInvalid(currentIndex) || isValueInvalid(all) || isValueInvalid(visibleAmount)) {
 		return [];
 	}
 
-	if (visibleAmount <= 2) {
-		return createSequence(1, visibleAmount);
+	if (visibleAmount === 1) {
+		return [currentIndex];
 	}
-
-	const args = [currentIndex, visibleAmount - 1, all];
 
 	if(!up && !down) {
 		up = true;
 	}
+
+	if (visibleAmount === 2) {
+		if (currentIndex === 1) {
+			return [1, 2];
+		}
+
+		if (currentIndex === all) {
+			return [all - 1, all];
+		}
+
+		return up ? [currentIndex, currentIndex + 1] : [currentIndex - 1, currentIndex];
+	}
+
+	const args = [currentIndex, visibleAmount - 1, all];
 
 	return up ? calcIndexUp(...args) : calIndexDown(...args);
 };
@@ -101,8 +113,6 @@ export const producePickerMap = ({
 	controls = {},
 	delimeter,
 } = {}) => {
-	assert(lastIndex, 'last index should be provided');
-
 	return pipe(
 		addValue(labels.firstLabel),
 		addValue(controls.controlDown),
@@ -124,7 +134,7 @@ export const producePickerMap = ({
 		const disableFirst = isControlDown || isFirsLabel;
 		const disableLast = isControlUp || isLastLabel;
 
-		const disabled = (disableFirst && isFirst) || (disableLast && isLast);
+		const disabled = !lastIndex || ((disableFirst && isFirst) || (disableLast && isLast));
 		const picked = value === currentIndex;
 
 		return { value, disabled, picked };

@@ -91,8 +91,8 @@ describe('paginator utils spec', () => {
 	});
 
 	describe('calculateIndexesUp', () => {
-		it('should throw an error, if value is not valid', () => {
-			expect(() => calculateIndexesUp(12, 5, 6)).toThrow();
+		it('should return empty arr, if value is not valid', () => {
+			expect(calculateIndexesUp(12, 5, 6)).toEqual([]);
 		});
 
 		it('should return sequence with full visible count, if it is include last value', () => {
@@ -143,7 +143,7 @@ describe('paginator utils spec', () => {
 			expect(calculateIndexesDown(9, 9, 15)).toEqual([1,2,3,4,5,6,7,8,9]);
 		});
 
-		it(`should invoke calculateIndexesUp, 
+		it(`should invoke calculateIndexesUp,
 		so that current index should be last value in array, or include last value`, () => {
 			expect(calculateIndexesDown(5, 4, 15)).toEqual([2,3,4,5]);
 			expect(calculateIndexesDown(6, 4, 15)).toEqual([3,4,5,6]);
@@ -172,14 +172,31 @@ describe('paginator utils spec', () => {
 			expect(calculateIndexes({ up: true })).toEqual([]);
 		});
 
-		it('should throw an error if both directions are provided', () => {
-			expect(() => calculateIndexes({ up: true, down: true })).toThrow();
+		it('should return empty arr if both directions are provided', () => {
+			expect(calculateIndexes({ up: true, down: true })).toEqual([]);
 		});
 
 		it(`should return array of one item, or from 1 to 2,
 		if visible amount is less or equal 2`, () => {
 			expect(calculateIndexes({ visibleAmount: 1, currentIndex: 1, all: 20 })).toEqual([1]);
+			expect(calculateIndexes({ visibleAmount: 1, currentIndex: 13, all: 20 })).toEqual([13]);
+
+
 			expect(calculateIndexes({ visibleAmount: 2, currentIndex: 1, all: 20 })).toEqual([1, 2]);
+			expect(calculateIndexes({ visibleAmount: 2, currentIndex: 2, all: 20 })).toEqual([2, 3]);
+			expect(calculateIndexes({ visibleAmount: 2, currentIndex: 3, all: 20 })).toEqual([3, 4]);
+			expect(calculateIndexes({ visibleAmount: 2, currentIndex: 4, all: 20 })).toEqual([4, 5]);
+
+			expect(calculateIndexes({ visibleAmount: 2, currentIndex: 20, all: 20 })).toEqual([19, 20]);
+			expect(calculateIndexes({ visibleAmount: 2, currentIndex: 19, all: 20 })).toEqual([19, 20]);
+
+			expect(calculateIndexes({ visibleAmount: 2, down: true, all: 20, currentIndex: 1 })).toEqual([1, 2]);
+			expect(calculateIndexes({ visibleAmount: 2, down: true, all: 20, currentIndex: 2 })).toEqual([1, 2]);
+			expect(calculateIndexes({ visibleAmount: 2, down: true, all: 20, currentIndex: 3 })).toEqual([2, 3]);
+			expect(calculateIndexes({ visibleAmount: 2, down: true, all: 20, currentIndex: 4 })).toEqual([3, 4]);
+
+			expect(calculateIndexes({ visibleAmount: 2, down: true, all: 20, currentIndex: 19 })).toEqual([18, 19]);
+			expect(calculateIndexes({ visibleAmount: 2, down: true, all: 20, currentIndex: 20 })).toEqual([19, 20]);
 		});
 
 		it('should use up direction by default', () => {
@@ -289,11 +306,8 @@ describe('paginator utils spec', () => {
 	});
 
 	describe('producePickerMap', () => {
-		it('should throw an error, if lastIndex is not provided', () => {
-			expect(() => producePickerMap()).toThrow();
-		});
-
 		it('should return new array', () => {
+			expect(producePickerMap()).toEqual([]);
 			expect(producePickerMap({ lastIndex: 12 })).toEqual([]);
 		});
 
@@ -412,13 +426,13 @@ describe('paginator utils spec', () => {
 			expect(withCurrentIndexOne).toEqual(expectedWithCurrentIndex);
 
 			//with current index last
-			const withCurrentIndexTwo = producePickerMap({ 
-				indexes, 
-				controls, 
-				labels, 
-				withLast, 
-				lastIndex, 
-				delimeter, 
+			const withCurrentIndexTwo = producePickerMap({
+				indexes,
+				controls,
+				labels,
+				withLast,
+				lastIndex,
+				delimeter,
 				currentIndex: indexes[indexes.length - 1] });
 
 			const expectedWithCurrentIndexTwo = [
