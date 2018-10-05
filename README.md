@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.org/DenisDashkevich/react-eco-ui-kit.svg?branch=master)](https://travis-ci.org/DenisDashkevich/react-eco-ui-kit)
 [![codecov](https://codecov.io/gh/DenisDashkevich/react-eco-ui-kit/branch/master/graphs/badge.svg)](https://codecov.io/gh/DenisDashkevich/react-eco-ui-kit)
+[![npm](https://img.shields.io/npm/v/react-eco-ui-kit.svg)](https://www.npmjs.com/package/react-eco-ui-kit)
 
 
 ### Components:
+
 * ### Paginator
 
 
@@ -47,6 +49,8 @@ renderPaginator(myData.length);
 ```
 
 * ### Delimeter
+
+
 | Name         | Type         | Default | Description |
 |:-------------:|:-------------:|:-----:|:------------:|
 | className      | string | `EMPTY` | provided class name for the Delimeter component
@@ -61,6 +65,8 @@ renderDelimeter({ value: '---', className: 'myDelimeter' });
 ```
 
 * ### Control
+
+
 | Name         | Type         | Default | Description |
 |:-------------:|:-------------:|:-----:|:------------:|
 | className      | string | `EMPTY` | provided class name for the Control component
@@ -77,6 +83,8 @@ renderControl({ value: '->', className: 'myControl' });
 ```
 
 * ### Label
+
+
 | Name         | Type         | Default | Description |
 |:-------------:|:-------------:|:-----:|:------------:|
 | className      | string | `EMPTY` | provided class name for the Label component
@@ -93,6 +101,8 @@ renderLabel({ value: 'FIRST', className: 'myLabel' });
 ```
 
 * ### Picker
+
+
 | Name         | Type         | Default | Description |
 |:-------------:|:-------------:|:-----:|:------------:|
 | className      | string | `EMPTY` | provided class name for the Picker component
@@ -109,6 +119,8 @@ renderPicker({ value: '22', className: 'myPicker' });
 ```
 
 * ### Input
+
+
 | Name         | Type         | Default | Description |
 |:-------------:|:-------------:|:-----:|:------------:|
 | className      | string | `EMPTY` | provided class name for the Input component
