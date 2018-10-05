@@ -29,6 +29,9 @@ import { Paginator, Input, Picker } from 'react-eco-ui-kit';
 * ### Paginator
 
 
+![Alt Text](https://github.com/DenisDashkevich/react-eco-ui-kit/blob/master/Paginator.gif)
+
+
 | Name         | Type         | Default | Description |
 |:-------------:|:-------------:|:-----:|:------------:|
 | amount      | number.isRequered | --- | All items
