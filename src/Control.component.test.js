@@ -9,7 +9,7 @@ import { CONTROL } from './consts/controls';
 describe('Control spec', () => {
 	it('renders with default values', () => {
 		const wrapper = shallow(<Control />);
-		
+
 		const divs = wrapper.find('div');
 
 		expect(divs).toHaveLength(1);
@@ -53,7 +53,7 @@ describe('Control spec', () => {
 		const value = 12;
 		const handler = jest.fn();
 
-		const wrapper = shallow(<Control value={value} onControlClick={handler} />);
+		const wrapper = shallow(<Control value={value} onClick={handler} />);
 
 		wrapper.find('div').simulate('click');
 		expect(handler).toHaveBeenCalledTimes(1);
@@ -63,7 +63,7 @@ describe('Control spec', () => {
 	it('should not invoke provided handler if disabled', () => {
 		const handler = jest.fn();
 
-		const wrapper = shallow(<Control onControlClick={handler} disabled={true} />);
+		const wrapper = shallow(<Control onClick={handler} disabled={true} />);
 		wrapper.find('div').simulate('click');
 		expect(handler).not.toHaveBeenCalled();
 	});

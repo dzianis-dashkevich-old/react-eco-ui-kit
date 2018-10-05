@@ -9,9 +9,9 @@ import { CONTROL } from './consts/controls';
 
 export default class Control extends Component {
 	onClick = () => {
-		const { onControlClick, disabled, value } = this.props;
+		const { onClick, disabled, value } = this.props;
 
-		!disabled && onControlClick(value);
+		!disabled && onClick(value);
 	};
 
 	render () {
@@ -31,7 +31,7 @@ export default class Control extends Component {
 }
 
 Control.defaultProps = {
-	onControlClick: noop,
+	onClick: noop,
 	disabled: false,
 	value: DEFAULT_VALUE,
 	className: EMPTY,
@@ -41,5 +41,5 @@ Control.propTypes = {
 	className: PropTypes.string,
 	disabled: PropTypes.bool,
 	value: PropTypes.any,
-	onControlClick: PropTypes.func,
+	onClick: PropTypes.func,
 };
