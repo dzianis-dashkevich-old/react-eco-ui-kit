@@ -59,11 +59,11 @@ export default class Paginator extends Component {
 	}
 
 	get allPikersCacheKey () {
-		return `${this.amount}${this.valuePerPage}`;
+		return `amount:${this.amount}_perPage:${this.valuePerPage}`;
 	}
 
 	get visiblePickersChacheKey () {
-		return `${this.allPickers}${this.amountPickersToShow}`;
+		return `all:${this.allPickers}_toShow:${this.amountPickersToShow}`;
 	}
 
 	get allPickers () {
