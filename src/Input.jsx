@@ -29,11 +29,10 @@ export default class Input extends Component {
 			if (value == receivedValue) {
 				return;
 			}
-
-			onChange(receivedValue);
 		}
 
 		this.setState({ isValid });
+		onChange(receivedValue);
 	};
 
 	render () {

@@ -38,6 +38,7 @@ export default class Paginator extends Component {
 
 		this.state = {
 			currentIndex: initIndex,
+			controlInputValue: initIndex,
 			valuePerPage,
 			allPickers,
 			visiblePickers: calculateVisiblePickers(allPickers, amountPickersToShow),
@@ -81,7 +82,7 @@ export default class Paginator extends Component {
 			return;
 		}
 
-		this.setState({ currentIndex: index });
+		this.setState({ currentIndex: index, controlInputValue: index });
 
 		this.props.onPickerChange(index);
 	};
@@ -214,9 +215,19 @@ export default class Paginator extends Component {
 			&& castToNumber <= this.state.allPickers;
 	}
 
+	onInputChange = (value) => {
+		this.setState({ controlInputValue: value });
+
+		if (!this.validateInput(value)) {
+			return;
+		}
+
+		this.onPickerChange(Number(value));
+	}
+
 	generateInputControl () {
 		const { enableInputControl, customInputComponent, inputControlValidator, inputClassName } = this.props;
-		const { currentIndex } = this.state;
+		const { controlInputValue } = this.state;
 
 		if (!enableInputControl) {
 			return null;
@@ -227,8 +238,8 @@ export default class Paginator extends Component {
 		return (<InputComponent
 			className={inputClassName}
 			validator={validator}
-			onChange={this.onPickerChange}
-			value={currentIndex}
+			onChange={this.onInputChange}
+			value={controlInputValue}
 		/>)
 
 	}
