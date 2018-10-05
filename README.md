@@ -38,13 +38,13 @@
 | inputClassName | string | `EMPTY` | provided class name for the Input component
 
 ##### Usage:
-	```javascript
-    	const renderPaginator => (amount) => (<Paginator amount={ amount } />);
 
-    	const myData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] //your data
+```javascript
+const renderPaginator = (amount) => (<Paginator amount={amount} />);
+const myData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] //your data
 
-    	renderPaginator(myData.length);
-    ```
+renderPaginator(myData.length);
+```
 
 * ### Delimeter
 | Name         | Type         | Default | Description |
@@ -53,11 +53,12 @@
 | value | any | `...` | Delimeter value to show
 
 ##### Usage:
-	```javascript
-    	const renderDelimeter => (props) => (<Delimeter {...props} />);
 
-    	renderDelimeter({ value: '---', className: 'myDelimeter' });
-    ```
+```javascript
+const renderDelimeter = (props) => (<Delimeter {...props} />);
+
+renderDelimeter({ value: '---', className: 'myDelimeter' });
+```
 
 * ### Control
 | Name         | Type         | Default | Description |
@@ -68,11 +69,12 @@
 | onClick | func | `noop` | click handler
 
 ##### Usage:
-	```javascript
-    	const renderControl => (props) => (<Control {...props} />);
 
-    	renderControl({ value: '->', className: 'myControl' });
-    ```
+```javascript
+const renderControl = (props) => (<Control {...props} />);
+
+renderControl({ value: '->', className: 'myControl' });
+```
 
 * ### Label
 | Name         | Type         | Default | Description |
@@ -83,11 +85,12 @@
 | onClick | func | `noop` | click handler
 
 ##### Usage:
-	```javascript
-    	const renderLabel => (props) => (<Label {...props} />);
 
-    	renderLabel({ value: 'FIRST', className: 'myLabel' });
-    ```
+```javascript
+const renderLabel = (props) => (<Label {...props} />);
+
+renderLabel({ value: 'FIRST', className: 'myLabel' });
+```
 
 * ### Picker
 | Name         | Type         | Default | Description |
@@ -99,11 +102,11 @@
 | onClick | func | `noop` | click handler
 
 ##### Usage:
-	```javascript
-    	const renderPicker => (props) => (<Picker {...props} />);
+```javascript
+const renderPicker = (props) => (<Picker {...props} />);
 
-    	renderPicker({ value: '22', className: 'myPicker' });
-    ```
+renderPicker({ value: '22', className: 'myPicker' });
+```
 
 * ### Input
 | Name         | Type         | Default | Description |
@@ -114,8 +117,9 @@
 | onChange | func | `noop` | change handler
 
 ##### Usage:
-	```javascript
-    	const renderInput => (props) => (<Input {...props} />);
 
-    	renderInput({ value: '22', className: 'myInput' });
-    ```
+```javascript
+const renderInput = (props) => (<Input {...props} />);
+
+renderInput({ value: '22', className: 'myInput' });
+```
