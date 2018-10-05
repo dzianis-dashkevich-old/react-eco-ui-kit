@@ -8,25 +8,38 @@ import { DEFAULT_VALUE, EMPTY } from './consts/core';
 import { VALID, INVALID, INPUT } from './consts/input';
 
 export default class Input extends Component {
-	constructor (props) {
-		super(props);
+	state = { isValid: this.validate(this.value) };
 
-		const { value, validator } = this.props;
-		const isValid = Boolean(validator(value));
-		this.state = { isValid };
+	get value () {
+		return this.props.value;
+	}
+
+	get isValid () {
+		return this.state.isValid;
+	}
+
+	get className () {
+		const { className } = this.props;
+		const validClassName = this.isValid ? VALID : INVALID;
+
+		return skipEmptyClassNames([INPUT, validClassName, className])
+	}
+
+	validate (value) {
+		return Boolean(this.props.validator(value));
 	}
 
 	onChange = ({ target }) => {
-		const { validator, onChange, value } = this.props;
+		const { onChange } = this.props;
 
 		let isValid = false;
 
 		const receivedValue = target.value;
 
-		if (validator(receivedValue)) {
+		if (this.validate(receivedValue)) {
 			isValid = true;
 
-			if (value == receivedValue) {
+			if (this.value == receivedValue) {
 				return;
 			}
 		}
@@ -36,17 +49,12 @@ export default class Input extends Component {
 	};
 
 	render () {
-		const { className, value } = this.props;
-		const { isValid } = this.state;
-
-		const validClassName = isValid ? VALID : INVALID;
-
 		return (
 			<input
-				className={skipEmptyClassNames([INPUT, validClassName, className])}
-				data-valid={isValid}
+				className={this.className}
+				data-valid={this.isValid}
 				onChange={this.onChange}
-				value={value}
+				value={this.value}
 			/>)
 	}
 }
