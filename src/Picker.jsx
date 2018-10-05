@@ -9,9 +9,9 @@ import { PICKER } from './consts/picker';
 
 export default class Picker extends Component {
 	onClick = () => {
-		const { onPickerClick, disabled, value } = this.props;
+		const { onClick, disabled, value } = this.props;
 
-		!disabled && onPickerClick(value);
+		!disabled && onClick(value);
 	};
 
 	render () {
@@ -34,7 +34,7 @@ export default class Picker extends Component {
 }
 
 Picker.defaultProps = {
-	onPickerClick: noop,
+	onClick: noop,
 	disabled: false,
 	picked: false,
 	value: DEFAULT_VALUE,
@@ -46,5 +46,5 @@ Picker.propTypes = {
 	disabled: PropTypes.bool,
 	picked: PropTypes.bool,
 	value: PropTypes.any,
-	onPickerClick: PropTypes.func,
+	onClick: PropTypes.func,
 };

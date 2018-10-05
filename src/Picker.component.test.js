@@ -53,20 +53,20 @@ describe('Picker spec', () => {
 
 	it('should invoke provided handler', () => {
 		const value = 12;
-		const onPickerClick = jest.fn();
+		const onClick = jest.fn();
 
-		const wrapper = shallow(<Picker value={value} onPickerClick={onPickerClick} />);
+		const wrapper = shallow(<Picker value={value} onClick={onClick} />);
 
 		wrapper.find('div').simulate('click');
-		expect(onPickerClick).toHaveBeenCalledTimes(1);
-		expect(onPickerClick).toHaveBeenCalledWith(value);
+		expect(onClick).toHaveBeenCalledTimes(1);
+		expect(onClick).toHaveBeenCalledWith(value);
 	});
 
 	it('should not invoke provided handler if disabled', () => {
-		const onPickerClick = jest.fn();
+		const onClick = jest.fn();
 
-		const wrapper = shallow(<Picker onPickerClick={onPickerClick} disabled={true} />);
+		const wrapper = shallow(<Picker onClick={onClick} disabled={true} />);
 		wrapper.find('div').simulate('click');
-		expect(onPickerClick).not.toHaveBeenCalled();
+		expect(onClick).not.toHaveBeenCalled();
 	});
 });
