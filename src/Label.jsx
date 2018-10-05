@@ -8,23 +8,32 @@ import { DEFAULT_VALUE, EMPTY, DISABLED } from './consts/core';
 import { LABEL } from './consts/labels';
 
 export default class Label extends Component {
-	onClick = () => {
-		const { onClick, disabled, value } = this.props;
+	get value () {
+		return this.props.value;
+	}
 
-		!disabled && onClick(value);
-	};
+	get disabled () {
+		return this.props.disabled;
+	}
 
-	render () {
-		const { value, disabled, className } = this.props;
+	get className () {
+		const { disabled } = this;
+		const { className } = this.props;
 		const disabledClassName = disabled ? DISABLED : EMPTY;
 
+		return skipEmptyClassNames([LABEL, disabledClassName, className]);
+	}
+
+	onClick = () => !this.disabled && this.props.onClick(this.value);
+
+	render () {
 		return (
 			<div
-				className={skipEmptyClassNames([LABEL, disabledClassName, className])}
-				data-disabled={disabled}
-				onClick={ this.onClick }
+				className={this.className}
+				data-disabled={this.disabled}
+				onClick={this.onClick}
 			>
-				{ value }
+				{this.value}
 			</div>
 		);
 	}
