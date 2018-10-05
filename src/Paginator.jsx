@@ -20,7 +20,7 @@ import { skipEmptyClassNames } from './utils/string';
 import { EMPTY } from './consts/core';
 import { FIRST, LAST } from './consts/labels';
 import { CONTROL_UP, CONTROL_DOWN } from './consts/controls';
-import { 
+import {
 	PAGINATOR,
 	DEFAULT_INIT_INDEX,
 	DEFAULT_DELIMETER,
@@ -157,7 +157,7 @@ export default class Paginator extends Component {
 			value={value}
 			disabled={disabled}
 			picked={picked}
-			onPickerClick={this.onPickerChange}
+			onClick={this.onPickerChange}
 		/>);
 	}
 
@@ -165,12 +165,12 @@ export default class Paginator extends Component {
 		const { customControlComponent, controlClassName } = this.props;
 		const ControlComponent = customControlComponent;
 
-		return (<ControlComponent 
+		return (<ControlComponent
 			key={`${value}${disabled}`}
 			className={controlClassName}
 			value={value}
 			disabled={disabled}
-			onControlClick={this.onPickerChange}
+			onClick={this.onPickerChange}
 			/>);
 	}
 
@@ -178,12 +178,12 @@ export default class Paginator extends Component {
 		const { customLabelComponent, labelClassName } = this.props;
 		const LabelComponent = customLabelComponent;
 
-		return (<LabelComponent 
+		return (<LabelComponent
 			key={`${value}${disabled}`}
 			className={labelClassName}
 			value={value}
 			disabled={disabled}
-			onLabelClick={this.onPickerChange}
+			onClick={this.onPickerChange}
 			/>);
 	}
 
@@ -211,7 +211,7 @@ export default class Paginator extends Component {
 		return !isNaN(castToNumber)
 			&& isFinite(castToNumber)
 			&& castToNumber > 0
-			&& castToNumber <= this.state.allPickers; 
+			&& castToNumber <= this.state.allPickers;
 	}
 
 	generateInputControl () {
@@ -227,7 +227,7 @@ export default class Paginator extends Component {
 		return (<InputComponent
 			className={inputClassName}
 			validator={validator}
-			onInputChange={this.onPickerChange}
+			onChange={this.onPickerChange}
 			value={currentIndex}
 		/>)
 
