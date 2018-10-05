@@ -318,9 +318,9 @@ export default class Paginator extends Component {
 
 	generateInputControl () {
 		const { enableInputControl, customInputComponent, inputControlValidator, inputClassName } = this.props;
-		const { controlInputValue } = this;
+		const { controlInputValue, amount } = this;
 
-		if (!enableInputControl) {
+		if (!enableInputControl || !amount) {
 			return null;
 		}
 
