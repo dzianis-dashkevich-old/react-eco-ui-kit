@@ -5,6 +5,9 @@
 [![npm](https://img.shields.io/npm/v/react-eco-ui-kit.svg)](https://www.npmjs.com/package/react-eco-ui-kit)
 
 
+##### Please note, all components are styleless. You should add styles by your self.
+
+
 ##### Usage:
 
 ```javascript
