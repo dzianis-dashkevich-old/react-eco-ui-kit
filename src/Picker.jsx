@@ -8,26 +8,38 @@ import { DEFAULT_VALUE, PICKED, DISABLED, EMPTY } from './consts/core';
 import { PICKER } from './consts/picker';
 
 export default class Picker extends Component {
-	onClick = () => {
-		const { onClick, disabled, value } = this.props;
+	get value () {
+		return this.props.value;
+	}
 
-		!disabled && onClick(value);
-	};
+	get disabled () {
+		return this.props.disabled;
+	}
 
-	render () {
-		const { value, disabled, picked, className } = this.props;
+	get picked () {
+		return this.props.picked;
+	}
 
+	get className () {
+		const { disabled, picked } = this;
+		const { className } = this.props;
 		const disabledClassName = disabled ? DISABLED : EMPTY;
 		const pickedClassName = picked ? PICKED : EMPTY;
 
+		return skipEmptyClassNames([PICKER, disabledClassName, pickedClassName, className]);
+	}
+
+	onClick = () => !this.disabled && this.props.onClick(this.value);
+
+	render () {
 		return (
 			<div
-				className={skipEmptyClassNames([PICKER, disabledClassName, pickedClassName, className])}
-				data-disabled={disabled}
-				data-picked={picked}
-				onClick={ this.onClick }
+				className={this.className}
+				data-disabled={this.disabled}
+				data-picked={this.picked}
+				onClick={this.onClick}
 			>
-				{ value }
+				{this.value}
 			</div>
 		);
 	}
