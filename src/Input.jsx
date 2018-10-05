@@ -16,8 +16,8 @@ export default class Input extends Component {
 		this.state = { isValid };
 	}
 
-	onInputchange = ({ target }) => {
-		const { validator, onInputChange, value } = this.props;
+	onChange = ({ target }) => {
+		const { validator, onChange, value } = this.props;
 
 		let isValid = false;
 
@@ -30,7 +30,7 @@ export default class Input extends Component {
 				return;
 			}
 
-			onInputChange(receivedValue);
+			onChange(receivedValue);
 		}
 
 		this.setState({ isValid });
@@ -46,14 +46,14 @@ export default class Input extends Component {
 			<input
 				className={skipEmptyClassNames([INPUT, validClassName, className])}
 				data-valid={isValid}
-				onChange={this.onInputchange}
+				onChange={this.onChange}
 				value={value}
 			/>)
 	}
 }
 
 Input.defaultProps = {
-	onInputChange: noop,
+	onChange: noop,
 	validator: identity,
 	className: EMPTY,
 	value: DEFAULT_VALUE,
@@ -62,6 +62,6 @@ Input.defaultProps = {
 Input.propTypes = {
 	className: PropTypes.string,
 	validator: PropTypes.func,
-	onInputChange: PropTypes.func,
+	onChange: PropTypes.func,
 	value: PropTypes.any,
 };

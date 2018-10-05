@@ -36,41 +36,41 @@ describe('Input spec', () => {
 	});
 
 	it('should call provided handler, if value is not same', () => {
-		const onInputChange = jest.fn();
+		const onChange = jest.fn();
 		const simulatedValue = 12;
-		const wrapper = mount(<Input onInputChange={onInputChange} />);
+		const wrapper = mount(<Input onChange={onChange} />);
 
 		const inputs = wrapper.find('input');
 
 		inputs.simulate('change', { target: { value: simulatedValue } });
 
-		expect(onInputChange).toHaveBeenCalledTimes(1);
-		expect(onInputChange).toHaveBeenCalledWith(simulatedValue);
+		expect(onChange).toHaveBeenCalledTimes(1);
+		expect(onChange).toHaveBeenCalledWith(simulatedValue);
 	});
 
 	it('should not call provided handler if values are same', () => {
-		const onInputChange = jest.fn();
+		const onChange = jest.fn();
 		const simulatedValue = DEFAULT_VALUE;
-		const wrapper = mount(<Input onInputChange={onInputChange} />);
+		const wrapper = mount(<Input onChange={onChange} />);
 
 		const inputs = wrapper.find('input');
 
 		inputs.simulate('change', { target: { value: simulatedValue } });
 
-		expect(onInputChange).not.toHaveBeenCalled();
+		expect(onChange).not.toHaveBeenCalled();
 	});
 
 	it('should not call provided handler if validator fails', () => {
-		const onInputChange = jest.fn();
+		const onChange = jest.fn();
 		const validator = () => false;
 		const simulatedValue = DEFAULT_VALUE;
-		const wrapper = mount(<Input onInputChange={onInputChange} validator={validator} />);
+		const wrapper = mount(<Input onChange={onChange} validator={validator} />);
 
 		const inputs = wrapper.find('input');
 
 		inputs.simulate('change', { target: { value: simulatedValue } });
 
-		expect(onInputChange).not.toHaveBeenCalled();
+		expect(onChange).not.toHaveBeenCalled();
 	});
 
 	it('should update ui after setState', () => {
