@@ -30,43 +30,188 @@ import {
 } from './consts/paginator';
 
 export default class Paginator extends Component {
-	constructor (props) {
-		super(props);
+	_allPickersCache = {};
+	_visiblePickersCache = {};
+	state = {
+		currentIndex: this.initIndex,
+		controlInputValue: this.initIndex,
+		direction: { up: true, down: false },
+	};
 
-		const { valuePerPage, amount, amountPickersToShow, initIndex } = props;
-		const allPickers = calculateAllAvailablePickers(amount, valuePerPage);
+	get initIndex () {
+		return this.props.initIndex;
+	}
 
-		this.state = {
-			currentIndex: initIndex,
-			controlInputValue: initIndex,
-			valuePerPage,
+	get className () {
+		return skipEmptyClassNames([PAGINATOR, this.props.className]);
+	}
+
+	get amount () {
+		return this.props.amount;
+	}
+
+	get amountPickersToShow () {
+		return this.props.amountPickersToShow;
+	}
+
+	get valuePerPage () {
+		return this.props.valuePerPage;
+	}
+
+	get allPikersCacheKey () {
+		return `${this.amount}${this.valuePerPage}`;
+	}
+
+	get visiblePickersChacheKey () {
+		return `${this.allPickers}${this.amountPickersToShow}`;
+	}
+
+	get allPickers () {
+		const cachedValue = this._allPickersCache[this.allPikersCacheKey];
+
+		if (cachedValue) {
+			return cachedValue;
+		}
+
+		const allPickers = calculateAllAvailablePickers(this.amount, this.valuePerPage);
+		this._allPickersCache[this.allPikersCacheKey] = allPickers;
+
+		return allPickers;
+	}
+
+	get visiblePickers () {
+		const cachedValue = this._visiblePickersCache[this.visiblePickersChacheKey];
+
+		if (cachedValue) {
+			return cachedValue;
+		}
+
+		const visiblePickers = calculateVisiblePickers(this.allPickers, this.amountPickersToShow);
+		this._visiblePickersCache[this.visiblePickersChacheKey] = visiblePickers;
+
+		return visiblePickers;
+	}
+
+	get indexes () {
+		const { currentIndex, allPickers, visiblePickers, direction } = this;
+		const { up, down } = direction;
+
+		return calculateIndexes({ currentIndex, up, down, all: allPickers, visibleAmount: visiblePickers });
+	}
+
+	get sequence () {
+		const {
+			currentIndex,
 			allPickers,
-			visiblePickers: calculateVisiblePickers(allPickers, amountPickersToShow),
-			direction: { up: true, down: false },
-		};
+			visiblePickers,
+			indexes,
+			labelsConfig,
+			controlsConfig,
+			delimeter
+		 } = this;
+
+		return producePickerMap({
+			withLast: indexes.length !== visiblePickers,
+			labels: labelsConfig,
+			delimeter,
+			controls: controlsConfig,
+			currentIndex,
+			indexes,
+			lastIndex: allPickers,
+		});
+	}
+
+	get labelsConfig () {
+		const { enableLabels, firstLabel, lastLabel } = this;
+
+		return enableLabels ? { firstLabel, lastLabel } : {};
+	}
+
+	get controlsConfig () {
+		const { enableControls, controlUp, controlDown } = this;
+
+		return enableControls ? { controlUp, controlDown } : {};
+	}
+
+	get delimeter () {
+		const { enableDelimeter, delimeterValue } = this;
+
+		return enableDelimeter && delimeterValue;
+	}
+
+	get enableDelimeter () {
+		return this.props.enableDelimeter;
+	}
+
+	get delimeterValue () {
+		return this.props.delimeterValue;
+	}
+
+	get firstLabel () {
+		return this.props.firstLabel;
+	}
+
+	get lastLabel () {
+		return this.props.lastLabel;
+	}
+
+	get enableLabels () {
+		return this.props.enableLabels;
+	}
+
+	get controlUp () {
+		return this.props.controlUp;
+	}
+
+	get controlDown () {
+		return this.props.controlDown;
+	}
+
+	get enableControls () {
+		return this.props.enableControls;
+	}
+
+	get direction () {
+		return this.state.direction;
+	}
+
+	get currentIndex () {
+		return this.state.currentIndex;
+	}
+
+	get controlInputValue () {
+		return this.state.controlInputValue;
+	}
+
+	isDelimeter (value) {
+		return value === this.delimeterValue;
+	}
+
+	isControl (value) {
+		return value === this.controlUp || value === this.controlDown;
+	}
+
+	isLabel (value) {
+		return value === this.firstLabel || value === this.lastLabel;
 	}
 
 	toggleDirection () {
-		const { direction } = this.state;
-		const { up, down } = direction;
+		const { up, down } = this.direction;
 		const newDirection = { up: !up, down: !down };
 
 		this.setState({ direction: newDirection });
 	}
 
 	convertValueToIndex (value) {
-		const { firstLabel, lastLabel, controlUp, controlDown } = this.props;
-		const { allPickers, currentIndex } = this.state;
-
 		switch (value) {
-			case firstLabel:
+			case this.firstLabel:
 				return 1;
-			case lastLabel:
-				return allPickers;
-			case controlUp:
-				return currentIndex + 1;
-			case controlDown:
-				return currentIndex - 1;
+			case this.lastLabel:
+				return this.allPickers;
+			case this.controlUp:
+				return this.currentIndex + 1;
+			case this.controlDown:
+				return this.currentIndex - 1;
 			default:
 				return value;
 		}
@@ -74,9 +219,8 @@ export default class Paginator extends Component {
 
 	onPickerChange = (value) => {
 		const index = this.convertValueToIndex(value);
-		const { currentIndex } = this.state;
 
-		if (index === currentIndex) {
+		if (index === this.currentIndex) {
 			this.toggleDirection();
 
 			return;
@@ -87,64 +231,10 @@ export default class Paginator extends Component {
 		this.props.onPickerChange(index);
 	};
 
-	calculateLabels () {
-		const { enableLabels, firstLabel, lastLabel } = this.props;
-		return enableLabels ? { firstLabel, lastLabel } : {};
-	}
-
-	calculateControls () {
-		const { enableControls, controlUp, controlDown } = this.props;
-		return enableControls ? { controlUp, controlDown } : {};
-	}
-
-	calculateDelimeter () {
-		const { enableDelimeter, delimeterValue } = this.props;
-		return enableDelimeter ? delimeterValue : false;
-	}
-
-	calculateIndexes () {
-		const { currentIndex, allPickers, visiblePickers, direction } = this.state;
-		const { up, down } = direction;
-
-		return calculateIndexes({
-			currentIndex,
-			up,
-			down,
-			all: allPickers,
-			visibleAmount: visiblePickers });
-	}
-
-	calculateSequence () {
-		const indexes = this.calculateIndexes();
-
-		const { currentIndex, allPickers, visiblePickers } = this.state;
-
-		return producePickerMap({
-			withLast: indexes.length !== visiblePickers,
-			labels: this.calculateLabels(),
-			delimeter: this.calculateDelimeter(),
-			controls: this.calculateControls(),
-			currentIndex,
-			indexes,
-			lastIndex: allPickers,
-		});
-	}
-
-	isDelimeter (value) {
-		return value === this.props.delimeterValue;
-	}
-
-	isControl (value) {
-		return value === this.props.controlUp || value === this.props.controlDown;
-	}
-
-	isLabel (value) {
-		return value === this.props.firstLabel || value === this.props.lastLabel;
-	}
-
 	generateDelimeter (value) {
 		const { customDelimeterComponent, delimeterClassName } = this.props;
 		const DelimeterComponent = customDelimeterComponent;
+
 		return (<DelimeterComponent key={value} className={delimeterClassName} value={value} />);
 	}
 
@@ -189,7 +279,7 @@ export default class Paginator extends Component {
 	}
 
 	generateSequence () {
-		return this.calculateSequence()
+		return this.sequence
 			.map(({ value, disabled, picked }) => {
 				if (this.isDelimeter(value)) {
 					return this.generateDelimeter(value);
@@ -209,10 +299,11 @@ export default class Paginator extends Component {
 
 	validateInput = (value) => {
 		const castToNumber = Number(value);
+
 		return !isNaN(castToNumber)
 			&& isFinite(castToNumber)
 			&& castToNumber > 0
-			&& castToNumber <= this.state.allPickers;
+			&& castToNumber <= this.allPickers;
 	}
 
 	onInputChange = (value) => {
@@ -227,7 +318,7 @@ export default class Paginator extends Component {
 
 	generateInputControl () {
 		const { enableInputControl, customInputComponent, inputControlValidator, inputClassName } = this.props;
-		const { controlInputValue } = this.state;
+		const { controlInputValue } = this;
 
 		if (!enableInputControl) {
 			return null;
@@ -235,6 +326,7 @@ export default class Paginator extends Component {
 
 		const InputComponent = customInputComponent;
 		const validator = inputControlValidator || this.validateInput;
+
 		return (<InputComponent
 			className={inputClassName}
 			validator={validator}
@@ -245,10 +337,8 @@ export default class Paginator extends Component {
 	}
 
 	render () {
-		const { className } = this.props;
-
 		return (
-			<div className={ skipEmptyClassNames([PAGINATOR, className]) } >
+			<div className={ this.className } >
 				{ this.generateInputControl() }
 				{ this.generateSequence() }
 			</div>)
