@@ -15,12 +15,14 @@
 	"jsnext:main": "es/index.js",
 	"scripts": {
 		"test": "jest",
-		"clean": "rimraf dist es coverage",
+		"clean": "rimraf lib es coverage",
 		"build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
 		"build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
 		"build": "run-s clean && run-p build:**",
 		"prepublishOnly": "run-s build"
 	},
+	"files": [ "es", "lib" ],
+	"sideEffects": false,
 	"keywords": [
 		"ui-kit",
 		"react-ui-kit"
