@@ -130,10 +130,10 @@ describe('Paginator specs', () => {
 		const controls = wrapper.find(Control);
 
 		const firstControl = controls.at(0);
-		checkProps(firstControl.props(), { 
-			value: controlsProps.controlDown, 
+		checkProps(firstControl.props(), {
+			value: controlsProps.controlDown,
 			className: controlsProps.controlClassName });
-		
+
 		const secondControl = controls.at(1);
 		checkProps(secondControl.props(), {
 			value: controlsProps.controlUp,
@@ -211,6 +211,10 @@ describe('Paginator specs', () => {
 		//change input to 5
 		wrapper.find(Input).simulate('change', { target: { value: 5 } });
 		expect(handler).toHaveBeenLastCalledWith(5);
+
+		//change input to invalid value
+		wrapper.find(Input).simulate('change', { target: { value: 'invalid' } });
+		expect(handler).toHaveBeenCalledTimes(4);
 
 		//change input to 5 (not invoke handler)
 		wrapper.find(Input).simulate('change', { target: { value: 5 } });

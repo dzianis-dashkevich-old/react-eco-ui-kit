@@ -60,19 +60,6 @@ describe('Input spec', () => {
 		expect(onChange).not.toHaveBeenCalled();
 	});
 
-	it('should not call provided handler if validator fails', () => {
-		const onChange = jest.fn();
-		const validator = () => false;
-		const simulatedValue = DEFAULT_VALUE;
-		const wrapper = mount(<Input onChange={onChange} validator={validator} />);
-
-		const inputs = wrapper.find('input');
-
-		inputs.simulate('change', { target: { value: simulatedValue } });
-
-		expect(onChange).not.toHaveBeenCalled();
-	});
-
 	it('should update ui after setState', () => {
 		const simulatedValue = 12;
 		const wrapper = mount(<Input validator={(val) => val < simulatedValue} />);
