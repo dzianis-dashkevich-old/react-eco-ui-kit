@@ -38,6 +38,12 @@ export default class Paginator extends Component {
 		direction: { up: true, down: false },
 	};
 
+	componentDidUpdate(prevProps) {
+		if (prevProps.amount !== this.props.amount) {
+			this.setState({ currentIndex: 1 });
+		}
+	}
+
 	get initIndex () {
 		return this.props.initIndex;
 	}
